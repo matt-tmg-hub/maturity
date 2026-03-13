@@ -57,6 +57,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   const [answers, setAnswers] = useState<Record<string, string>>(editAnswers || {})
   const [currentQ, setCurrentQ] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const [showCompletion, setShowCompletion] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [showResumeBanner, setShowResumeBanner] = useState(false)
   const [draftData, setDraftData] = useState<{ answers: Record<string, string>; companyInfo: CompanyInfo } | null>(null)
@@ -132,6 +133,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
     setAnswers(prev => ({ ...prev, [qId]: level }))
     setTimeout(() => {
       if (currentQ < TOTAL - 1) setCurrentQ(q => q + 1)
+        else setShowCompletion(true)
     }, 320)
   }
 
@@ -164,7 +166,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   const domainProgress = currentQ - domainStartIdx + 1
   const domainTotal = currentDomain?.questions.length || 0
 
-  // ── COMPANY INFO SCREEN ─────────────────────────────────────────────────
+  // ââ COMPANY INFO SCREEN âââââââââââââââââââââââââââââââââââââââââââââââââ
   if (screen === 'company') {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
@@ -302,7 +304,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
     )
   }
 
-  // ── ASSESSMENT SCREEN ───────────────────────────────────────────────────
+  // ââ ASSESSMENT SCREEN âââââââââââââââââââââââââââââââââââââââââââââââââââ
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
       {/* Sticky header */}
@@ -494,6 +496,35 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
           <p style={{ fontSize: 11, color: '#9ca3af', margin: '8px 0 0' }}>Click any square to jump to that question</p>
         </div>
       </main>
+
+      {/* Completion screen */}
+      {showCompletion && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,31,61,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '24px' }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: '48px 40px', maxWidth: 520, width: '100%', textAlign: 'center', boxShadow: '0 24px 80px rgba(0,0,0,0.3)' }}>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', border: '3px solid #16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, fontWeight: 400, color: '#0f1f3d', marginBottom: 12 }}>Assessment Complete!</h2>
+            <p style={{ fontSize: 15, color: '#6b7280', lineHeight: 1.6, marginBottom: 32 }}>
+              You've answered all {ALL_QUESTIONS.length} questions. You can review and edit any previous answer, or click <strong>View Results</strong> to generate your report.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexDirection: 'column' }}>
+              <button
+                onClick={handleSubmit}
+                style={{ backgroundColor: '#0f1f3d', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, padding: '14px 0', borderRadius: 10, width: '100%' }}
+              >
+                View Results →
+              </button>
+              <button
+                onClick={() => { setShowCompletion(false); setCurrentQ(0); }}
+                style={{ backgroundColor: 'transparent', color: '#0f1f3d', border: '2px solid #e5e7eb', cursor: 'pointer', fontSize: 15, fontWeight: 500, padding: '12px 0', borderRadius: 10, width: '100%' }}
+              >
+                Review &amp; Edit Answers
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Submitting overlay */}
       {submitting && (
