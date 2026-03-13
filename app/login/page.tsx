@@ -69,13 +69,8 @@ export default function LoginPage() {
       <nav className="auth-nav">
         <a href="/" className="logo">
           <div className="logo-mark">
-            <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-              <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/>
-              <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
-              <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
-              <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#f59e0b"/>
-            </svg>
-          </div>
+              <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht_M_Solid_Blue_Sq_Clear_Background.png" alt="Mainspring M" style={{width:36,height:36,borderRadius:8,display:'block'}} />
+            </div>
           <div>
             <div className="logo-text">Builder Maturity</div>
             <span className="logo-sub">The Mainspring Group</span>
