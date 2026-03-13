@@ -35,7 +35,6 @@ export async function POST(request: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       mode: isAnnual ? 'subscription' : 'payment',
       allow_promotion_codes: true,
-      payment_method_collection: 'if_required',
       success_url: `${appUrl}/dashboard?payment=success&plan=${planType}`,
       cancel_url: `${appUrl}/pricing?canceled=true`,
       metadata: { supabase_user_id: user.id, plan_type: planType },
