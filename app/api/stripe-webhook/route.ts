@@ -13,6 +13,14 @@ function getServiceClient() {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getPeriodEnd(sub: any): string | null {
+  if (sub?.current_period_end) {
+    return new Date(sub.current_period_end * 1000).toISOString()
+  }
+  return null
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')
@@ -72,7 +80,8 @@ export async function POST(request: NextRequest) {
               ? session.subscription
               : session.subscription.id
 
-          const sub = await stripe.subscriptions.retrieve(subscriptionId) as unknown as Stripe.Subscription
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const sub: any = await stripe.subscriptions.retrieve(subscriptionId)
 
           const { error } = await supabase.from('subscriptions').upsert(
             {
@@ -83,7 +92,7 @@ export async function POST(request: NextRequest) {
               status: 'active',
               assessments_limit: null,
               assessments_used: 0,
-              current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+              current_period_end: getPeriodEnd(sub),
               created_at: new Date().toISOString(),
             },
             { onConflict: 'user_id' }
@@ -95,12 +104,13 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const sub = event.data.object as Stripe.Subscription
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sub: any = event.data.object
         const { error } = await supabase
           .from('subscriptions')
           .update({
             status: sub.status === 'active' ? 'active' : 'expired',
-            current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+            current_period_end: getPeriodEnd(sub),
           })
           .eq('stripe_subscription_id', sub.id)
         if (error) console.error('[stripe-webhook] update subscription error:', error)
@@ -127,4 +137,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ received: true })
 }
-
