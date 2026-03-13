@@ -37,16 +37,16 @@ const GLOSSARY_TERMS: { term: string; full: string; def: string }[] = [
   { term: 'CRM', full: 'Customer Relationship Management', def: 'Software that tracks leads, prospects, and customer communications throughout the sales pipeline.' },
   { term: 'BIM', full: 'Building Information Modeling', def: 'A 3D digital model containing design, schedule, and cost data. 4D BIM adds time/schedule; 5D BIM adds cost.' },
   { term: 'DfMA', full: 'Design for Manufacturing & Assembly', def: 'Designing home components to be built off-site and assembled on the lot, rather than constructed from scratch on-site.' },
-  { term: 'Digital Twin', full: 'Digital Twin', def: 'A live digital replica of the completed home tied to its actual systems — delivered at closing for ongoing management, warranty, and smart home control.' },
+  { term: 'Digital Twin', full: 'Digital Twin', def: 'A live digital replica of the completed home tied to its actual systems â delivered at closing for ongoing management, warranty, and smart home control.' },
   { term: 'AP', full: 'Accounts Payable', def: 'The internal function responsible for processing and paying invoices and purchase orders to trade partners and suppliers.' },
   { term: 'PO / WO', full: 'Purchase Order / Work Order', def: 'A PO is a formal commitment to buy specific labor or materials. A WO instructs a specific task to be performed. Both define scope and price before work begins.' },
-  { term: 'G&A', full: 'General & Administrative', def: 'Overhead costs not tied to a specific job — office rent, staff salaries, insurance, software subscriptions, etc.' },
+  { term: 'G&A', full: 'General & Administrative', def: 'Overhead costs not tied to a specific job â office rent, staff salaries, insurance, software subscriptions, etc.' },
   { term: 'EFT', full: 'Electronic Funds Transfer', def: 'Direct bank-to-bank payment (ACH) instead of mailing a paper check.' },
   { term: 'JIT', full: 'Just-In-Time', def: 'Ordering materials and scheduling labor to arrive exactly when needed, minimizing waste and on-site storage.' },
   { term: 'QC', full: 'Quality Control', def: 'Inspecting completed work against defined standards before approving payment or moving to the next phase.' },
-  { term: 'KPI', full: 'Key Performance Indicator', def: 'A measurable metric to track business performance — e.g., cycle time, defect rate, or customer satisfaction score.' },
+  { term: 'KPI', full: 'Key Performance Indicator', def: 'A measurable metric to track business performance â e.g., cycle time, defect rate, or customer satisfaction score.' },
   { term: 'Stakeout', full: 'Stakeout', def: 'The surveying step where lot boundaries and foundation footprint are physically marked on the ground before construction begins.' },
-  { term: 'AI / ML', full: 'Artificial Intelligence / Machine Learning', def: 'Software that learns from data to automate decisions — e.g., optimizing schedules, predicting buyer behavior, or flagging quality issues.' },
+  { term: 'AI / ML', full: 'Artificial Intelligence / Machine Learning', def: 'Software that learns from data to automate decisions â e.g., optimizing schedules, predicting buyer behavior, or flagging quality issues.' },
 ]
 
 function getScoreColor(pct: number): string {
@@ -193,7 +193,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   const domainProgress = currentQ - domainStartIdx + 1
   const domainTotal = currentDomain?.questions.length || 0
 
-  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ COMPANY INFO SCREEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+  // ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ COMPANY INFO SCREEN ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
   if (screen === 'company') {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
@@ -331,7 +331,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
     )
   }
 
-  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ ASSESSMENT SCREEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+  // ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ASSESSMENT SCREEN ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
       {/* Sticky header */}
@@ -340,13 +340,15 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
         <div style={{ padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 30, height: 30, background: '#0f1f3d', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
+              <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="5,82 18,82 38,18 25,18" fill="white"/><polygon points="25,18 38,18 30,42 17,42" fill="white"/><polygon points="17,42 30,42 43,82 30,82" fill="white"/><polygon points="48,82 61,82 50,42 37,42" fill="white"/><polygon points="37,42 50,42 62,18 49,18" fill="white"/><polygon points="49,18 62,18 87,82 87,74 70,74 78,55 66,55 55,82 74,82" fill="white"/></svg>
             </div>
             <span style={{ fontSize: 14, fontWeight: 700, color: '#0f1f3d' }}>Builder Maturity</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <span style={{ fontSize: 12, color: '#9ca3af' }}>{answeredCount} of {TOTAL} answered</span>
-          <button onClick={() => setShowGlossary(true)} style={{ fontSize: 12, color: '#1d4ed8', background: 'none', border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Glossary</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <a href="/dashboard" style={{ fontSize: 12, color: '#6b7280', textDecoration: 'none', padding: '4px 10px', border: '1px solid #e5e7eb', borderRadius: 6, fontWeight: 500 }}>← Dashboard</a>
+            <button onClick={() => { try { localStorage.setItem('bm_saved','1') } catch(e){} window.location.href = '/dashboard' }} style={{ fontSize: 12, color: '#16a34a', background: 'none', border: '1px solid #bbf7d0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Save &amp; Exit</button>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>{answeredCount}/{TOTAL}</span>
+            
             {answeredCount >= 10 && (
               <button
                 onClick={handleSubmit}
@@ -489,7 +491,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
             }}
           >
             <span style={{ fontSize: 12, fontWeight: 700, background: answers[currentQuestion.id] === 'na' ? 'rgba(255,255,255,0.3)' : '#e5e7eb', borderRadius: 4, padding: '2px 6px' }}>N/A</span>
-            Not applicable to my business â excluded from scoring
+            Not applicable to my business Ã¢ÂÂ excluded from scoring
           </button>
         </div>
 
@@ -525,22 +527,27 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
 
         {/* Answered count grid mini-map */}
         <div style={{ marginTop: 24, padding: '16px 20px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Progress Map</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {ALL_QUESTIONS.map((q, i) => (
-              <button
-                key={q.id}
-                onClick={() => setCurrentQ(i)}
-                title={q.label}
-                style={{
-                  width: 16, height: 16, borderRadius: 3, border: 'none', cursor: 'pointer',
-                  background: i === currentQ ? '#0f1f3d' : answers[q.id] !== undefined ? getScoreColor(parseInt(answers[q.id]) === -1 ? 0 : parseInt(answers[q.id]) * 25) : '#f3f4f6'
-                }}
-              />
-            ))}
-          </div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '8px 0 0' }}>Click any square to jump to that question</p>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px' }}>Progress Map</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {DOMAINS.map((domain) => {
+            const dqs = ALL_QUESTIONS.map((q, qi) => ({ q, qi })).filter(({ q }) => q.domainKey === domain.key)
+            const isActive = currentQuestion?.domainKey === domain.key
+            return (
+              <div key={domain.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 10, color: isActive ? '#0f1f3d' : '#9ca3af', fontWeight: isActive ? 700 : 400, width: 70, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{domain.short}</span>
+                <div style={{ display: 'flex', gap: 3 }}>
+                  {dqs.map(({ q, qi }) => (
+                    <button key={q.id} onClick={() => setCurrentQ(qi)} title={q.label}
+                      style={{ width: 14, height: 14, borderRadius: 2, border: qi === currentQ ? '2px solid #0f1f3d' : 'none', cursor: 'pointer', flexShrink: 0,
+                        background: qi === currentQ ? '#0f1f3d' : answers[q.id] !== undefined ? getScoreColor(answers[q.id] === 'na' ? 0 : (parseInt(answers[q.id]) + 1) * 25) : '#f3f4f6' }} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
+        <p style={{ fontSize: 11, color: '#9ca3af', margin: '10px 0 0' }}>Click any square to jump to that question</p>
+      </div>
       </main>
 
       {/* Glossary modal */}
@@ -552,7 +559,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
                 <h2 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 22, fontWeight: 400, color: '#0f1f3d', margin: 0 }}>Glossary</h2>
                 <p style={{ fontSize: 13, color: '#6b7280', margin: '2px 0 0' }}>Industry terms used throughout this assessment</p>
               </div>
-              <button onClick={() => setShowGlossary(false)} style={{ width: 32, height: 32, borderRadius: '50%', border: '1px solid #e5e7eb', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#6b7280', flexShrink: 0 }}>×</button>
+              <button onClick={() => setShowGlossary(false)} style={{ width: 32, height: 32, borderRadius: '50%', border: '1px solid #e5e7eb', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#6b7280', flexShrink: 0 }}>Ã</button>
             </div>
             <div style={{ overflowY: 'auto', padding: '16px 28px 24px' }}>
               {GLOSSARY_TERMS.map(({ term, full, def }) => (
@@ -585,7 +592,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
                 onClick={handleSubmit}
                 style={{ backgroundColor: '#0f1f3d', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, padding: '14px 0', borderRadius: 10, width: '100%' }}
               >
-                View Results Ã¢ÂÂ
+                View Results ÃÂ¢ÃÂÃÂ
               </button>
               <button
                 onClick={() => { setShowCompletion(false); setCurrentQ(0); }}
