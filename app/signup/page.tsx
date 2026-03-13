@@ -9,7 +9,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [done, setDone] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
   async function handleSignup() {
@@ -17,44 +17,11 @@ export default function SignupPage() {
     setLoading(true); setError('')
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { data: { full_name: fullName }, emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` }
+      options: { data: { full_name: fullName } }
     })
     if (error) { setError(error.message); setLoading(false); return }
-    setDone(true); setLoading(false)
+    router.push('/pricing')
   }
-
-  const navLogo = (
-    <nav style={{background:'#fff',borderBottom:'1px solid #e5e7eb',padding:'0 2rem',height:60,display:'flex',alignItems:'center'}}>
-      <a href="/" style={{display:'flex',alignItems:'center',gap:10,textDecoration:'none'}}>
-        <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht%20M%20Solid%20Blue%20Sq%20Clear%20Background.png" alt="Mainspring M" style={{width:36,height:36,borderRadius:8,display:'block'}} />
-        <div>
-          <div style={{fontSize:15,fontWeight:700,color:'#0f1f3d'}}>Builder Maturity</div>
-          <span style={{fontSize:11,color:'#9ca3af',display:'block',lineHeight:1}}>The Mainspring Group</span>
-        </div>
-      </a>
-    </nav>
-  );
-
-  if (done) return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Inter',sans-serif;background:#f9fafb;min-height:100vh;}
-      `}</style>
-      {navLogo}
-      <div style={{minHeight:'calc(100vh - 60px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'40px 1rem'}}>
-        <div style={{background:'#fff',border:'1px solid #e5e7eb',borderRadius:16,padding:'48px 40px',width:'100%',maxWidth:440,boxShadow:'0 4px 24px rgba(0,0,0,0.06)',textAlign:'center'}}>
-          <div style={{width:64,height:64,background:'#dcfce7',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14L11 19L22 8" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-          <h1 style={{fontFamily:"'DM Serif Display',serif",fontSize:26,color:'#0f1f3d',marginBottom:10}}>Check your email</h1>
-          <p style={{fontSize:14,color:'#4b5563',lineHeight:1.7,marginBottom:28}}>We sent a confirmation link to <strong>{email}</strong>.<br/>Click it to activate your account, then sign in.</p>
-          <a href="/login" style={{display:'inline-block',padding:'12px 28px',background:'#0f1f3d',color:'#fff',fontSize:14,fontWeight:600,borderRadius:10,textDecoration:'none'}}>Go to Sign In</a>
-        </div>
-      </div>
-    </>
-  );
 
   return (
     <>
@@ -83,7 +50,18 @@ export default function SignupPage() {
         .auth-switch{text-align:center;font-size:14px;color:var(--gray-600);}
         .auth-switch a{color:var(--blue);font-weight:600;text-decoration:none;}
       `}</style>
-      {navLogo}
+
+      <nav style={{background:'#fff',borderBottom:'1px solid #e5e7eb',padding:'0 2rem',height:60,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <a href="/" style={{display:'flex',alignItems:'center',gap:10,textDecoration:'none'}}>
+          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht%20M%20Solid%20Blue%20Sq%20Clear%20Background.png" alt="Mainspring M" style={{width:36,height:36,borderRadius:8,display:'block'}} />
+          <div>
+            <div style={{fontSize:15,fontWeight:700,color:'#0f1f3d'}}>Builder Maturity</div>
+            <span style={{fontSize:11,color:'#9ca3af',display:'block',lineHeight:1}}>The Mainspring Group</span>
+          </div>
+        </a>
+        <a href="/login" style={{fontSize:'13px',fontWeight:500,padding:'7px 16px',borderRadius:'7px',border:'1px solid #e5e7eb',background:'#fff',color:'#374151',textDecoration:'none'}}>Sign In</a>
+      </nav>
+
       <div className="auth-wrap">
         <div className="auth-card">
           <div className="auth-eyebrow">Get Started</div>
@@ -93,7 +71,9 @@ export default function SignupPage() {
           <div className="field"><label>Full name</label><input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="John Smith" /></div>
           <div className="field"><label>Work email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" /></div>
           <div className="field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignup()} placeholder="At least 8 characters" /></div>
-          <button className="btn-navy" onClick={handleSignup} disabled={loading || !email || !password || !fullName}>{loading ? 'Creating account...' : 'Create Account'}</button>
+          <button className="btn-navy" onClick={handleSignup} disabled={loading || !email || !password || !fullName}>
+            {loading ? 'Creating account...' : 'Create Account →'}
+          </button>
           <p className="terms">By creating an account you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
           <div className="divider"><div className="divider-line"/><span className="divider-text">already have an account?</span><div className="divider-line"/></div>
           <p className="auth-switch"><a href="/login">Sign in instead</a></p>
