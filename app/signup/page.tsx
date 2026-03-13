@@ -7,12 +7,14 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
   async function handleSignup() {
+    if (!agreed) { setError('You must accept the Terms of Use and Privacy Policy to continue.'); return }
     if (password.length < 8) { setError('Password must be at least 8 characters.'); return }
     setLoading(true); setError('')
     const { error } = await supabase.auth.signUp({
@@ -42,13 +44,15 @@ export default function SignupPage() {
         .field input:focus{border-color:var(--blue);}
         .btn-navy{width:100%;padding:13px;background:var(--navy);color:var(--white);font-size:15px;font-weight:600;border:none;border-radius:10px;cursor:pointer;margin-top:4px;font-family:var(--font);transition:opacity .15s;}
         .btn-navy:disabled{opacity:.5;cursor:not-allowed;}
-        .terms{font-size:11px;color:var(--gray-400);text-align:center;margin-top:16px;line-height:1.6;}
-        .terms a{color:var(--gray-600);}
         .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
         .divider-line{flex:1;height:1px;background:var(--gray-200);}
         .divider-text{font-size:12px;color:var(--gray-400);}
         .auth-switch{text-align:center;font-size:14px;color:var(--gray-600);}
         .auth-switch a{color:var(--blue);font-weight:600;text-decoration:none;}
+        .checkbox-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;}
+        .checkbox-row input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;cursor:pointer;accent-color:var(--navy);}
+        .checkbox-row label{font-size:13px;color:var(--gray-600);line-height:1.5;cursor:pointer;}
+        .checkbox-row a{color:var(--blue);font-weight:600;text-decoration:none;}
       `}</style>
 
       <nav style={{background:'#fff',borderBottom:'1px solid #e5e7eb',padding:'0 2rem',height:60,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
@@ -71,10 +75,15 @@ export default function SignupPage() {
           <div className="field"><label>Full name</label><input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="John Smith" /></div>
           <div className="field"><label>Work email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" /></div>
           <div className="field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignup()} placeholder="At least 8 characters" /></div>
-          <button className="btn-navy" onClick={handleSignup} disabled={loading || !email || !password || !fullName}>
+          <div className="checkbox-row">
+            <input type="checkbox" id="agree" checked={agreed} onChange={e => setAgreed(e.target.checked)} />
+            <label htmlFor="agree">
+              I have read and agree to the <a href="/terms" target="_blank">Terms of Use</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.
+            </label>
+          </div>
+          <button className="btn-navy" onClick={handleSignup} disabled={loading || !email || !password || !fullName || !agreed}>
             {loading ? 'Creating account...' : 'Create Account →'}
           </button>
-          <p className="terms">By creating an account you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
           <div className="divider"><div className="divider-line"/><span className="divider-text">already have an account?</span><div className="divider-line"/></div>
           <p className="auth-switch"><a href="/login">Sign in instead</a></p>
         </div>
