@@ -72,7 +72,7 @@ function DashboardInner() {
     <div style={{minHeight:'100vh',background:'#f9fafb',fontFamily:"'Inter',sans-serif"}}>
       <nav style={{background:'#fff',borderBottom:'1px solid #e5e7eb',padding:'0 24px',height:60,display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
         <a href="/" style={{display:'flex',alignItems:'center',gap:10,textDecoration:'none'}}>
-          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht_M_Solid_Blue_Sq_Clear_Background.png" alt="Mainspring M" style={{width:36,height:36,borderRadius:8,display:'block'}} />
+          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht%20M%20Solid%20Blue%20Sq%20Clear%20Background.png" alt="Mainspring M" style={{width:36,height:36,borderRadius:8,display:'block'}} />
           <div><span style={{fontSize:15,fontWeight:700,color:'#0f1f3d',display:'block',lineHeight:1.2}}>Builder Maturity</span><span style={{fontSize:10,color:'#9ca3af',display:'block',lineHeight:1}}>by The Mainspring Group</span></div>
         </a>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
