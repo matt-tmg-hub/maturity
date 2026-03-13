@@ -5,8 +5,10 @@ import AssessmentClient from './AssessmentClient'
 export default async function AssessmentPage({
   searchParams,
 }: {
-  searchParams: { edit?: string }
+  searchParams: Promise<{ edit?: string }>
 }) {
+  const { edit } = await searchParams
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -42,13 +44,13 @@ export default async function AssessmentPage({
   let editCompanyInfo: { company: string; name: string; title: string; volume: string; state: string } | undefined
   let editAssessmentId: string | undefined
 
-  if (searchParams.edit) {
+  if (edit) {
     // Only annual subscribers can edit
     if (sub.plan_type === 'annual') {
       const { data: assessment } = await supabase
         .from('assessments')
         .select('*')
-        .eq('id', searchParams.edit)
+        .eq('id', edit)
         .eq('user_id', user.id)
         .single()
 
