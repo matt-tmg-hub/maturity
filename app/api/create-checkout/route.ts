@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await request.json()
-    const { planType, promoCode } = body
+    const { planType } = body
 
     if (!planType || !['annual', 'onetime'].includes(planType)) {
       return NextResponse.json({ error: 'Invalid plan type' }, { status: 400 })
@@ -29,26 +29,16 @@ export async function POST(request: NextRequest) {
     const isAnnual = planType === 'annual'
     const priceId = isAnnual ? process.env.STRIPE_ANNUAL_PRICE_ID! : process.env.STRIPE_ONETIME_PRICE_ID!
 
-    let discounts: Stripe.Checkout.SessionCreateParams['discounts'] = undefined
-    if (promoCode && promoCode.trim()) {
-      const promoCodes = await stripe.promotionCodes.list({ code: promoCode.trim().toUpperCase(), active: true, limit: 1 })
-      if (promoCodes.data.length > 0) {
-        discounts = [{ promotion_code: promoCodes.data[0].id }]
-      } else {
-        return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 400 })
-      }
-    }
-
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: isAnnual ? 'subscription' : 'payment',
+      allow_promotion_codes: true,
+      payment_method_collection: 'if_required',
       success_url: `${appUrl}/dashboard?payment=success&plan=${planType}`,
       cancel_url: `${appUrl}/pricing?canceled=true`,
       metadata: { supabase_user_id: user.id, plan_type: planType },
-      ...(discounts && { discounts }),
-      payment_method_collection: 'if_required',
       ...(isAnnual && { subscription_data: { metadata: { supabase_user_id: user.id, plan_type: planType } } }),
     })
 
