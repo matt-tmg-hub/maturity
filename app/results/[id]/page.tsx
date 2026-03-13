@@ -226,7 +226,7 @@ export default function ResultsPage() {
       doc.setFont('helvetica', 'normal')
       doc.setTextColor(160, 170, 190)
       doc.text('Builder Maturity Report', MARGIN, 7)
-      doc.text(assessment.company_name, PAGE_W - MARGIN, 7, { align: 'right' })
+      doc.text(assessment?.company_name ?? '', PAGE_W - MARGIN, 7, { align: 'right' })
     }
 
     function addFooter() {
