@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${appUrl}/pricing?canceled=true`,
       metadata: { supabase_user_id: user.id, plan_type: planType },
       ...(discounts && { discounts }),
+      payment_method_collection: 'if_required',
       ...(isAnnual && { subscription_data: { metadata: { supabase_user_id: user.id, plan_type: planType } } }),
     })
 
