@@ -6,16 +6,16 @@ export default function HomePage() {
   const router = useRouter();
 
   const domains = [
-    { icon: "🏢", title: "Org Structure", description: "Evaluate how your company is organized, who owns decisions, and whether your leadership team has the clarity to scale." },
-    { icon: "👷", title: "Customer Experience", description: "Measure how consistently you deliver a great buyer journey — from first contact through warranty and beyond." },
-    { icon: "🔨", title: "Trade Partner", description: "Assess how well you recruit, onboard, manage, and retain the trade partners that build your homes." },
-    { icon: "⚙️", title: "Internal Operations", description: "Examine your processes, workflows, and systems for scheduling, field management, and cost control." },
-    { icon: "👷", title: "Builder Rep", description: "Assess how your field managers and superintendents engage customers and trade partners throughout construction — from pre-con through closing, scheduling, quality, and payment approval." },
-    { icon: "💻", title: "Supporting Systems", description: "Review the technology stack and data practices that support your operations and decision-making." },
+    { icon: "ð¢", title: "Org Structure", description: "Evaluate how your company is organized, who owns decisions, and whether your leadership team has the clarity to scale." },
+    { icon: "ð·", title: "Customer Experience", description: "Measure how consistently you deliver a great buyer journey â from first contact through warranty and beyond." },
+    { icon: "ð¨", title: "Trade Partner", description: "Assess how well you recruit, onboard, manage, and retain the trade partners that build your homes." },
+    { icon: "âï¸", title: "Internal Operations", description: "Examine your processes, workflows, and systems for scheduling, field management, and cost control." },
+    { icon: "ð·", title: "Builder Rep", description: "Assess how your field managers and superintendents engage customers and trade partners throughout construction â from pre-con through closing, scheduling, quality, and payment approval." },
+    { icon: "ð»", title: "Supporting Systems", description: "Review the technology stack and data practices that support your operations and decision-making." },
   ];
 
   const steps = [
-    { number: "01", title: "Take the Assessment", description: "Answer 53 targeted questions across 6 operational domains. Takes about 20–30 minutes." },
+    { number: "01", title: "Take the Assessment", description: "Answer 53 targeted questions across 6 operational domains. Takes about 20â30 minutes." },
     { number: "02", title: "Get Your Score", description: "Instantly see your maturity level across every domain, with an overall score out of 100." },
     { number: "03", title: "Follow Your Roadmap", description: "Receive AI-powered, prioritized recommendations tailored to where your business actually is today." },
   ];
@@ -32,7 +32,7 @@ export default function HomePage() {
       <nav style={{ position: "sticky", top: 0, zIndex: 100, height: 60, backgroundColor: "#ffffff", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 32, height: 32, backgroundColor: "#0f1f3d", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12l4-4 4 4 4-8 4 8" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="5,82 18,82 38,18 25,18" fill="white"/><polygon points="25,18 38,18 30,42 17,42" fill="white"/><polygon points="17,42 30,42 43,82 30,82" fill="white"/><polygon points="48,82 61,82 50,42 37,42" fill="white"/><polygon points="37,42 50,42 62,18 49,18" fill="white"/><polygon points="49,18 62,18 87,82 87,74 70,74 78,55 66,55 55,82 74,82" fill="white"/></svg>
           </div>
           <div>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 15, fontWeight: 400, color: "#0f1f3d", lineHeight: 1.1 }}>Builder Maturity</div>
@@ -51,11 +51,11 @@ export default function HomePage() {
         <div style={{ position: "relative", maxWidth: 760, margin: "0 auto" }}>
           <div style={{ display: "inline-block", backgroundColor: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 99, padding: "5px 16px", fontSize: 12, fontWeight: 600, color: "#f59e0b", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: 24 }}>Operational Maturity for Homebuilders</div>
           <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "clamp(36px, 6vw, 62px)", fontWeight: 400, color: "#ffffff", lineHeight: 1.15, marginBottom: 24 }}>
-            Find out exactly where{" "}<span style={{ color: "#f59e0b", fontStyle: "italic" }}>your building company</span>{" "}stands — and what to do next.
+            Find out exactly where{" "}<span style={{ color: "#f59e0b", fontStyle: "italic" }}>your building company</span>{" "}stands â and what to do next.
           </h1>
           <p style={{ fontSize: 18, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, maxWidth: 560, margin: "0 auto 40px" }}>Builder Maturity is the only assessment built specifically for residential homebuilders. 53 questions. 6 domains. One clear roadmap.</p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={() => router.push("/pricing")} style={{ backgroundColor: "#f59e0b", color: "#0f1f3d", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, padding: "14px 32px", borderRadius: 9 }}>Take the Assessment →</button>
+            <button onClick={() => router.push("/pricing")} style={{ backgroundColor: "#f59e0b", color: "#0f1f3d", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, padding: "14px 32px", borderRadius: 9 }}>Take the Assessment â</button>
             <button onClick={() => router.push("/login")} style={{ backgroundColor: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.3)", cursor: "pointer", fontSize: 15, fontWeight: 500, padding: "14px 28px", borderRadius: 9 }}>Sign In</button>
           </div>
         </div>
@@ -67,7 +67,7 @@ export default function HomePage() {
             <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 15, fontWeight: 700, color: "#0f1f3d" }}>{item.value}</span>
               <span style={{ fontSize: 14, color: "#6b7280" }}>{item.label}</span>
-              <span style={{ color: "#e5e7eb", marginLeft: 4 }}>·</span>
+              <span style={{ color: "#e5e7eb", marginLeft: 4 }}>Â·</span>
             </div>
           ))}
         </div>
@@ -93,7 +93,7 @@ export default function HomePage() {
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 400, color: "#0f1f3d", marginBottom: 12 }}>Six domains. Complete clarity.</h2>
-            <p style={{ fontSize: 16, color: "#6b7280", maxWidth: 520, margin: "0 auto" }}>The assessment covers every critical area of a modern homebuilding operation — nothing is left out.</p>
+            <p style={{ fontSize: 16, color: "#6b7280", maxWidth: 520, margin: "0 auto" }}>The assessment covers every critical area of a modern homebuilding operation â nothing is left out.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
             {domains.map((domain) => (
@@ -120,7 +120,7 @@ export default function HomePage() {
             <p style={{ fontSize: 14, color: "#374151", marginBottom: 20, lineHeight: 1.6 }}>Unlimited assessments for your whole team. Full editing and PDF exports included.</p>
             <ul style={{ listStyle: "none", marginBottom: 28 }}>
               {["Unlimited assessments", "Edit & re-run assessments any time", "Full PDF export with AI recommendations", "Dashboard with historical tracking", "Priority support"].map((f) => (
-                <li key={f} style={{ fontSize: 14, color: "#374151", padding: "5px 0", display: "flex", alignItems: "center", gap: 8 }}><span style={{ color: "#16a34a", fontWeight: 700 }}>✓</span> {f}</li>
+                <li key={f} style={{ fontSize: 14, color: "#374151", padding: "5px 0", display: "flex", alignItems: "center", gap: 8 }}><span style={{ color: "#16a34a", fontWeight: 700 }}>â</span> {f}</li>
               ))}
             </ul>
             <button onClick={() => router.push("/pricing")} style={{ backgroundColor: "#0f1f3d", color: "#ffffff", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 700, padding: "13px 0", borderRadius: 9, width: "100%" }}>Get Annual Access</button>
@@ -131,7 +131,7 @@ export default function HomePage() {
             <p style={{ fontSize: 14, color: "#374151", marginBottom: 20, lineHeight: 1.6 }}>Run a single assessment right now. No subscription required.</p>
             <ul style={{ listStyle: "none", marginBottom: 28 }}>
               {["1 full 53-question assessment", "AI-powered recommendations report", "PDF export", "No subscription needed"].map((f) => (
-                <li key={f} style={{ fontSize: 14, color: "#374151", padding: "5px 0", display: "flex", alignItems: "center", gap: 8 }}><span style={{ color: "#16a34a", fontWeight: 700 }}>✓</span> {f}</li>
+                <li key={f} style={{ fontSize: 14, color: "#374151", padding: "5px 0", display: "flex", alignItems: "center", gap: 8 }}><span style={{ color: "#16a34a", fontWeight: 700 }}>â</span> {f}</li>
               ))}
             </ul>
             <button onClick={() => router.push("/pricing")} style={{ backgroundColor: "transparent", color: "#0f1f3d", border: "2px solid #0f1f3d", cursor: "pointer", fontSize: 15, fontWeight: 700, padding: "13px 0", borderRadius: 9, width: "100%" }}>Buy Single Assessment</button>
@@ -143,7 +143,7 @@ export default function HomePage() {
       <footer style={{ backgroundColor: "#0f1f3d", padding: "36px 24px", textAlign: "center" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 20 }}>
           <div style={{ width: 28, height: 28, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 12l4-4 4 4 4-8 4 8" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="5,82 18,82 38,18 25,18" fill="white"/><polygon points="25,18 38,18 30,42 17,42" fill="white"/><polygon points="17,42 30,42 43,82 30,82" fill="white"/><polygon points="48,82 61,82 50,42 37,42" fill="white"/><polygon points="37,42 50,42 62,18 49,18" fill="white"/><polygon points="49,18 62,18 87,82 87,74 70,74 78,55 66,55 55,82 74,82" fill="white"/></svg>
           </div>
           <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 14, color: "#ffffff" }}>Builder Maturity</span>
         </div>
