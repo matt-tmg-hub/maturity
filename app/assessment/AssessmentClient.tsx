@@ -49,7 +49,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   editAssessmentId?: string
 }) {
   const router = useRouter()
-  const [screen, setScreen] = useState<'company' | 'assessment' | 'submitting'>('company')
+  const [screen, setScreen] = useState<'company' | 'assessment' | 'submitting'>(editAnswers ? 'assessment' : 'company')
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(
     editCompanyInfo || { company: '', name: '', title: 'CEO', volume: '', state: '' }
   )
@@ -90,6 +90,13 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
     }, 500)
     return () => clearTimeout(timer)
   }, [answers, companyInfo, screen, userId])
+
+  // In edit mode: jump to first unanswered question on mount
+  useEffect(() => {
+    if (!editAnswers) return
+    const firstUnanswered = ALL_QUESTIONS.findIndex(q => !editAnswers[q.id])
+    setCurrentQ(firstUnanswered >= 0 ? firstUnanswered : 0)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function resumeDraft() {
     if (!draftData) return
@@ -166,7 +173,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   const domainProgress = currentQ - domainStartIdx + 1
   const domainTotal = currentDomain?.questions.length || 0
 
-  // ââ COMPANY INFO SCREEN âââââââââââââââââââââââââââââââââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ COMPANY INFO SCREEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   if (screen === 'company') {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
@@ -304,7 +311,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
     )
   }
 
-  // ââ ASSESSMENT SCREEN âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ ASSESSMENT SCREEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
       {/* Sticky header */}
@@ -447,6 +454,24 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
           </div>
         </div>
 
+        {/* N/A option */}
+        <div style={{ marginTop: 8 }}>
+          <button
+            onClick={() => selectAnswer(currentQuestion.id, 'na')}
+            style={{
+              width: '100%', padding: '10px 16px', borderRadius: 8,
+              border: `2px solid ${answers[currentQuestion.id] === 'na' ? '#6b7280' : '#e5e7eb'}`,
+              background: answers[currentQuestion.id] === 'na' ? '#6b7280' : '#f9fafb',
+              color: answers[currentQuestion.id] === 'na' ? '#fff' : '#6b7280',
+              fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'left' as const,
+              display: 'flex', alignItems: 'center', gap: 10
+            }}
+          >
+            <span style={{ fontSize: 12, fontWeight: 700, background: answers[currentQuestion.id] === 'na' ? 'rgba(255,255,255,0.3)' : '#e5e7eb', borderRadius: 4, padding: '2px 6px' }}>N/A</span>
+            Not applicable to my business — excluded from scoring
+          </button>
+        </div>
+
         {/* Navigation */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
           <button
@@ -460,10 +485,10 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <button
               onClick={() => setCurrentQ(q => Math.min(TOTAL - 1, q + 1))}
-              disabled={currentQ === TOTAL - 1}
+              disabled={currentQ === TOTAL - 1 || !answers[currentQuestion?.id]}
               style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: currentQ === TOTAL - 1 ? '#d1d5db' : '#374151', cursor: currentQ === TOTAL - 1 ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 500 }}
             >
-              Skip &rarr;
+              Next &rarr;
             </button>
             {answeredCount >= 10 && (
               <button
@@ -513,7 +538,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
                 onClick={handleSubmit}
                 style={{ backgroundColor: '#0f1f3d', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, padding: '14px 0', borderRadius: 10, width: '100%' }}
               >
-                View Results →
+                View Results â
               </button>
               <button
                 onClick={() => { setShowCompletion(false); setCurrentQ(0); }}
