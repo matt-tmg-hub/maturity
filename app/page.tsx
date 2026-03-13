@@ -30,7 +30,7 @@ export default function HomePage() {
 
       <nav style={{ position: "sticky", top: 0, zIndex: 100, height: 60, backgroundColor: "#ffffff", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht_M_Solid_Blue_Sq_Clear_Background.png" alt="Mainspring M" style={{ width: 36, height: 36, borderRadius: 8 }} />
+          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht%20M%20Solid%20Blue%20Sq%20Clear%20Background.png" alt="Mainspring M" style={{ width: 36, height: 36, borderRadius: 8 }} />
           <div>
             <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 15, fontWeight: 400, color: "#0f1f3d", lineHeight: 1.1 }}>Builder Maturity</div>
             <div style={{ fontSize: 10, color: "#6b7280", lineHeight: 1 }}>by The Mainspring Group</div>
@@ -139,7 +139,7 @@ export default function HomePage() {
 
       <footer style={{ backgroundColor: "#0f1f3d", padding: "36px 24px", textAlign: "center" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 20 }}>
-          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht_M_Solid_Blue_Sq_Clear_Background.png" alt="Mainspring M" style={{ width: 36, height: 36, borderRadius: 8 }} />
+          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht%20M%20Solid%20Blue%20Sq%20Clear%20Background.png" alt="Mainspring M" style={{ width: 36, height: 36, borderRadius: 8 }} />
           <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 14, color: "#ffffff" }}>Builder Maturity</span>
         </div>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 16 }}>by The Mainspring Group</p>
