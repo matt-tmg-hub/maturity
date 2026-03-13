@@ -7,10 +7,10 @@ export default function HomePage() {
 
   const domains = [
     { icon: "🏢", title: "Org Structure", description: "Evaluate how your company is organized, who owns decisions, and whether your leadership team has the clarity to scale." },
-    { icon: "🤝", title: "Customer Experience", description: "Measure how consistently you deliver a great buyer journey — from first contact through warranty and beyond." },
+    { icon: "👷", title: "Customer Experience", description: "Measure how consistently you deliver a great buyer journey — from first contact through warranty and beyond." },
     { icon: "🔨", title: "Trade Partner", description: "Assess how well you recruit, onboard, manage, and retain the trade partners that build your homes." },
     { icon: "⚙️", title: "Internal Operations", description: "Examine your processes, workflows, and systems for scheduling, field management, and cost control." },
-    { icon: "🤝", title: "Builder Rep", description: "Understand how effectively your sales team represents your brand, converts leads, and manages the buyer pipeline." },
+    { icon: "🤝", title: "Builder Rep", description: "Assess how your field managers and superintendents engage customers and trade partners throughout construction — from pre-con through closing, scheduling, quality, and payment approval." },
     { icon: "💻", title: "Supporting Systems", description: "Review the technology stack and data practices that support your operations and decision-making." },
   ];
 
