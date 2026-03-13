@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
               ? session.subscription
               : session.subscription.id
 
-          const sub = await stripe.subscriptions.retrieve(subscriptionId)
+          const sub = await stripe.subscriptions.retrieve(subscriptionId) as unknown as Stripe.Subscription
 
           const { error } = await supabase.from('subscriptions').upsert(
             {
@@ -127,3 +127,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ received: true })
 }
+
