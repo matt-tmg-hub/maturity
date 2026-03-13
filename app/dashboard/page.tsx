@@ -124,7 +124,7 @@ function DashboardInner() {
               <div style={{fontSize:12,color:'#6b7280',marginTop:2}}>{!hasSubscription?'Purchase a plan to start your assessment':isAnnual&&expiryDate?`Renews ${formatDate(expiryDate.toISOString())}`:isAnnual?'Active - unlimited assessments':!onetimeUsed?'Assessment available':'Assessment has been used'}</div>
             </div>
           </div>
-          {!hasSubscription ? <a href="/pricing" style={{fontSize:13,fontWeight:500,padding:'7px 16px',borderRadius:7,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',textDecoration:'none',whiteSpace:'nowrap'}}>View Plans</a> : <span style={{fontSize:11,fontWeight:700,letterSpacing:'0.04em',textTransform:'uppercase',padding:'4px 10px',borderRadius:20,background:onetimeUsed?'#fee2e2':'#dcfce7',color:onetimeUsed?'#991b1b':'#15803d'}}>{onetimeUsed?'Used':'Active'}</span>}
+          {!hasSubscription ? <a href="/pricing" style={{fontSize:13,fontWeight:500,padding:'7px 16px',borderRadius:7,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',textDecoration:'none',whiteSpace:'nowrap'}}>View Plans</a> : <div style={{display:'flex',alignItems:'center',gap:8}}><span style={{fontSize:11,fontWeight:700,letterSpacing:'0.04em',textTransform:'uppercase',padding:'4px 10px',borderRadius:20,background:onetimeUsed?'#fee2e2':'#dcfce7',color:onetimeUsed?'#991b1b':'#15803d'}}>{onetimeUsed?'Used':'Active'}</span>{onetimeUsed && <a href="/pricing" style={{fontSize:13,fontWeight:600,padding:'6px 14px',borderRadius:7,background:'#0f1f3d',color:'#fff',textDecoration:'none',whiteSpace:'nowrap'}}>Buy Another</a>}</div>}
         </div>
 
         {!hasSubscription && (
