@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
@@ -12,7 +11,6 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
-  const router = useRouter()
   const supabase = createClient()
 
   async function handleSignup() {
@@ -20,10 +18,8 @@ export default function SignupPage() {
       setError('Password must be at least 8 characters.')
       return
     }
-
     setLoading(true)
     setError('')
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -32,266 +28,192 @@ export default function SignupPage() {
         emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
       },
     })
-
     if (error) {
       setError(error.message)
       setLoading(false)
       return
     }
-
     setDone(true)
     setLoading(false)
   }
 
   if (done) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        padding: '24px',
-      }}>
-        <div style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          padding: '48px',
-          width: '100%',
-          maxWidth: '440px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto', display: 'block' }}>
-              <circle cx="28" cy="28" r="28" fill="#dcfce7" />
-              <path d="M18 28L24 34L38 20" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
+          *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+          :root{--navy:#0f1f3d;--accent:#f59e0b;--white:#ffffff;--gray-50:#f9fafb;--gray-200:#e5e7eb;--gray-400:#9ca3af;--gray-600:#4b5563;--blue:#1d4ed8;--green:#16a34a;--green-light:#dcfce7;--font:'Inter',sans-serif;--serif:'DM Serif Display',serif;}
+          body{font-family:var(--font);background:var(--gray-50);min-height:100vh;}
+          .auth-nav{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 2rem;height:60px;display:flex;align-items:center;}
+          .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+          .logo-mark{width:34px;height:34px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+          .logo-text{font-size:15px;font-weight:700;color:var(--navy);}
+          .logo-sub{font-size:11px;color:var(--gray-400);font-weight:400;display:block;line-height:1;}
+          .auth-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 1rem;}
+          .auth-card{background:var(--white);border:1px solid var(--gray-200);border-radius:16px;padding:48px 40px;width:100%;max-width:440px;box-shadow:0 4px 24px rgba(0,0,0,0.06);text-align:center;}
+          .check-circle{width:64px;height:64px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+          .auth-title{font-family:var(--serif);font-size:26px;color:var(--navy);margin-bottom:10px;}
+          .auth-sub{font-size:14px;color:var(--gray-600);line-height:1.7;margin-bottom:28px;}
+          .btn-navy{display:inline-block;padding:12px 28px;background:var(--navy);color:var(--white);font-size:14px;font-weight:600;border-radius:10px;text-decoration:none;}
+        `}</style>
+        <nav className="auth-nav">
+          <a href="/" className="logo">
+            <div className="logo-mark">
+              <svg viewBox="0 0 18 18" fill="none" width="18" height="18">
+                <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/>
+                <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+                <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+                <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#f59e0b"/>
+              </svg>
+            </div>
+            <div>
+              <div className="logo-text">Builder Maturity</div>
+              <span className="logo-sub">The Mainspring Group</span>
+            </div>
+          </a>
+        </nav>
+        <div className="auth-wrap">
+          <div className="auth-card">
+            <div className="check-circle">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M6 14L11 19L22 8" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h1 className="auth-title">Check your email</h1>
+            <p className="auth-sub">
+              We sent a confirmation link to <strong>{email}</strong>.<br/>
+              Click it to activate your account, then sign in.
+            </p>
+            <a href="/login" className="btn-navy">Go to Sign In</a>
           </div>
-          <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', margin: '0 0 12px 0' }}>
-            Check your email
-          </h2>
-          <p style={{ color: '#6b7280', fontSize: '15px', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-            We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then come back and sign in.
-          </p>
-          <Link href="/login" style={{
-            display: 'inline-block',
-            padding: '10px 24px',
-            backgroundColor: '#1d4ed8',
-            color: '#ffffff',
-            borderRadius: '8px',
-            textDecoration: 'none',
-            fontSize: '14px',
-            fontWeight: '600',
-          }}>
-            Go to Sign In
-          </Link>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8f9fa',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      padding: '24px',
-    }}>
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        padding: '48px',
-        width: '100%',
-        maxWidth: '440px',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-      }}>
-        {/* Brand */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            fontSize: '13px',
-            fontWeight: '600',
-            color: '#6b7280',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            marginBottom: '8px',
-          }}>
-            The Mainspring Group
-          </div>
-          <h1 style={{
-            fontSize: '26px',
-            fontWeight: '700',
-            color: '#111827',
-            margin: '0 0 4px 0',
-          }}>
-            Create your account
-          </h1>
-          <p style={{ color: '#6b7280', fontSize: '15px', margin: '0' }}>
-            Start your Builder Maturity assessment
-          </p>
-        </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+          --navy:#0f1f3d;--blue:#1d4ed8;--accent:#f59e0b;
+          --white:#ffffff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+          --gray-400:#9ca3af;--gray-600:#4b5563;--gray-700:#374151;--gray-900:#111827;
+          --red:#dc2626;--red-light:#fee2e2;
+          --font:'Inter',sans-serif;--serif:'DM Serif Display',serif;
+        }
+        body{font-family:var(--font);background:var(--gray-50);min-height:100vh;}
+        .auth-nav{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;}
+        .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .logo-mark{width:34px;height:34px;background:var(--navy);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+        .logo-text{font-size:15px;font-weight:700;color:var(--navy);}
+        .logo-sub{font-size:11px;color:var(--gray-400);font-weight:400;display:block;line-height:1;}
+        .auth-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 1rem;}
+        .auth-card{background:var(--white);border:1px solid var(--gray-200);border-radius:16px;padding:48px 40px;width:100%;max-width:440px;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
+        .auth-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+        .auth-title{font-family:var(--serif);font-size:28px;color:var(--navy);margin-bottom:6px;}
+        .auth-sub{font-size:14px;color:var(--gray-600);margin-bottom:32px;}
+        .error-box{background:var(--red-light);border:1px solid #fecaca;border-radius:8px;padding:12px 16px;margin-bottom:20px;color:var(--red);font-size:13px;}
+        .field{margin-bottom:18px;}
+        .field label{display:block;font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:6px;}
+        .field input{width:100%;padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;font-family:var(--font);font-size:14px;color:var(--gray-900);background:var(--white);outline:none;transition:border-color .15s;}
+        .field input:focus{border-color:var(--blue);}
+        .btn-navy{width:100%;padding:13px;background:var(--navy);color:var(--white);font-size:15px;font-weight:600;border:none;border-radius:10px;cursor:pointer;margin-top:4px;font-family:var(--font);transition:opacity .15s;}
+        .btn-navy:disabled{opacity:.5;cursor:not-allowed;}
+        .terms{font-size:11px;color:var(--gray-400);text-align:center;margin-top:16px;line-height:1.6;}
+        .terms a{color:var(--gray-600);}
+        .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+        .divider-line{flex:1;height:1px;background:var(--gray-200);}
+        .divider-text{font-size:12px;color:var(--gray-400);}
+        .auth-switch{text-align:center;font-size:14px;color:var(--gray-600);}
+        .auth-switch a{color:var(--blue);font-weight:600;text-decoration:none;}
+      `}</style>
 
-        {/* Error */}
-        {error && (
-          <div style={{
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            marginBottom: '20px',
-            color: '#dc2626',
-            fontSize: '14px',
-          }}>
-            {error}
+      <nav className="auth-nav">
+        <a href="/" className="logo">
+          <div className="logo-mark">
+            <svg viewBox="0 0 18 18" fill="none" width="18" height="18">
+              <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/>
+              <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#f59e0b"/>
+            </svg>
           </div>
-        )}
-
-        {/* Form */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Full name
-            </label>
+            <div className="logo-text">Builder Maturity</div>
+            <span className="logo-sub">The Mainspring Group</span>
+          </div>
+        </a>
+        <a href="/login" style={{fontSize:'13px',fontWeight:500,padding:'7px 16px',borderRadius:'7px',border:'1px solid var(--gray-200)',background:'var(--white)',color:'var(--gray-700)',textDecoration:'none'}}>
+          Sign In
+        </a>
+      </nav>
+
+      <div className="auth-wrap">
+        <div className="auth-card">
+          <div className="auth-eyebrow">Get Started</div>
+          <h1 className="auth-title">Create your account</h1>
+          <p className="auth-sub">Start your Builder Maturity assessment in minutes.</p>
+
+          {error && <div className="error-box">{error}</div>}
+
+          <div className="field">
+            <label>Full name</label>
             <input
               type="text"
               value={fullName}
               onChange={e => setFullName(e.target.value)}
               placeholder="John Smith"
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '15px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                color: '#111827',
-              }}
             />
           </div>
 
-          <div>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Work email
-            </label>
+          <div className="field">
+            <label>Work email</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@company.com"
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '15px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                color: '#111827',
-              }}
             />
           </div>
 
-          <div>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151',
-              marginBottom: '6px',
-            }}>
-              Password
-            </label>
+          <div className="field">
+            <label>Password</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSignup()}
               placeholder="At least 8 characters"
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '15px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                color: '#111827',
-              }}
             />
           </div>
 
           <button
+            className="btn-navy"
             onClick={handleSignup}
             disabled={loading || !email || !password || !fullName}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: loading || !email || !password || !fullName ? '#93c5fd' : '#1d4ed8',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '15px',
-              fontWeight: '600',
-              cursor: loading || !email || !password || !fullName ? 'not-allowed' : 'pointer',
-              marginTop: '4px',
-            }}
           >
-            {loading ? 'Creating account...' : 'Create account'}
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
+
+          <p className="terms">
+            By creating an account you agree to our{' '}
+            <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+          </p>
+
+          <div className="divider">
+            <div className="divider-line"/>
+            <span className="divider-text">already have an account?</span>
+            <div className="divider-line"/>
+          </div>
+
+          <p className="auth-switch">
+            <a href="/login">Sign in instead</a>
+          </p>
         </div>
-
-        <p style={{
-          textAlign: 'center',
-          fontSize: '12px',
-          color: '#9ca3af',
-          margin: '20px 0 0 0',
-          lineHeight: '1.5',
-        }}>
-          By creating an account you agree to our{' '}
-          <Link href="/terms" style={{ color: '#6b7280' }}>Terms of Service</Link>
-          {' '}and{' '}
-          <Link href="/privacy" style={{ color: '#6b7280' }}>Privacy Policy</Link>.
-        </p>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          margin: '20px 0',
-          gap: '12px',
-        }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }} />
-          <span style={{ fontSize: '13px', color: '#9ca3af' }}>already have an account?</span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }} />
-        </div>
-
-        <p style={{ textAlign: 'center', margin: '0' }}>
-          <Link href="/login" style={{
-            fontSize: '14px',
-            color: '#2563eb',
-            fontWeight: '500',
-            textDecoration: 'none',
-          }}>
-            Sign in instead
-          </Link>
-        </p>
       </div>
-    </div>
+    </>
   )
 }
