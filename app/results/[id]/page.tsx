@@ -259,7 +259,7 @@ export default function ResultsPage() {
       y += 7
     }
 
-    // ── PAGE 1 HEADER ─────────────────────────────────────────────
+    // ââ PAGE 1 HEADER âââââââââââââââââââââââââââââââââââââââââââââ
     doc.setFillColor(15, 31, 61)
     doc.rect(0, 0, PAGE_W, 28, 'F')
     doc.setTextColor(255, 255, 255)
@@ -318,7 +318,7 @@ export default function ResultsPage() {
     doc.text(`Maturity Level: ${assessment.maturity_level || 'N/A'}`, MARGIN, y + 8)
     y += 18
 
-    // ── DOMAIN SCORES ─────────────────────────────────────────────
+    // ââ DOMAIN SCORES âââââââââââââââââââââââââââââââââââââââââââââ
     sectionDivider('Domain Scores')
 
     DOMAIN_ORDER.forEach(key => {
@@ -342,7 +342,7 @@ export default function ResultsPage() {
       y += 12
     })
 
-    // ── RECOMMENDATIONS ───────────────────────────────────────────
+    // ââ RECOMMENDATIONS âââââââââââââââââââââââââââââââââââââââââââ
     sectionDivider('Recommendations')
 
     const recs = (assessment.ai_recommendations || '')
@@ -382,7 +382,7 @@ export default function ResultsPage() {
       }
     })
 
-    // ── MATURITY LEVEL REFERENCE ──────────────────────────────────
+    // ââ MATURITY LEVEL REFERENCE ââââââââââââââââââââââââââââââââââ
     sectionDivider('Maturity Level Reference')
 
     const levels = [
@@ -410,7 +410,7 @@ export default function ResultsPage() {
       y += 8
     })
 
-    // ── YOUR RESPONSES ────────────────────────────────────────────
+    // ââ YOUR RESPONSES ââââââââââââââââââââââââââââââââââââââââââââ
     addFooter()
     doc.addPage()
     addPageHeader()
@@ -544,7 +544,7 @@ export default function ResultsPage() {
       <nav style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <a href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <div style={{ width: 34, height: 34, background: '#0f1f3d', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
+            <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="5,82 18,82 38,18 25,18" fill="white"/><polygon points="25,18 38,18 30,42 17,42" fill="white"/><polygon points="17,42 30,42 43,82 30,82" fill="white"/><polygon points="48,82 61,82 50,42 37,42" fill="white"/><polygon points="37,42 50,42 62,18 49,18" fill="white"/><polygon points="49,18 62,18 87,82 87,74 70,74 78,55 66,55 55,82 74,82" fill="white"/></svg>
           </div>
           <div>
             <span style={{ fontSize: 15, fontWeight: 700, color: '#0f1f3d', display: 'block', lineHeight: 1.2 }}>Builder Maturity</span>
@@ -571,7 +571,7 @@ export default function ResultsPage() {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 6 }}>
                 {formatDate(assessment.completed_at || assessment.created_at)}
-                {assessment.respondent_name && ` · ${assessment.respondent_name}`}
+                {assessment.respondent_name && ` Â· ${assessment.respondent_name}`}
                 {assessment.respondent_title && `, ${assessment.respondent_title}`}
               </div>
               <h1 style={{ fontSize: 26, fontWeight: 700, margin: '0 0 12px', fontFamily: "'DM Serif Display',serif" }}>{assessment.company_name}</h1>
