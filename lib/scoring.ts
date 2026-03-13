@@ -37,7 +37,7 @@ export function calculateScores(answers: Record<string, string | null>): ScoreRe
   DOMAINS.forEach(domain => {
     const domainAnswers = domain.questions
       .map(q => answers[q.id])
-      .filter(a => a !== undefined && a !== null) as string[]
+      .filter(a => a !== undefined && a !== null && a !== 'na') as string[]
 
     if (domainAnswers.length === 0) {
       domainScores[domain.key] = {
