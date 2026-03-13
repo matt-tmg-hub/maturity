@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         const customerId =
           typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
 
-        if (planType === 'onetime' && session.payment_status === 'paid') {
+        if (planType === 'onetime' && (session.payment_status === 'paid' || session.payment_status === 'no_payment_needed')) {
           const { error } = await supabase.from('subscriptions').upsert(
             {
               user_id: userId,
