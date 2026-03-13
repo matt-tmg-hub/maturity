@@ -84,7 +84,7 @@ export default function PricingPage() {
         </div>
 
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '36px 28px', width: 340, display: 'flex', flexDirection: 'column', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-          <div style={{ fontSize: 44, fontWeight: 800, color: '#0f1f3d', lineHeight: 1, fontFamily: "'DM Serif Display',serif" }}>$49</div>
+          <div style={{ fontSize: 44, fontWeight: 800, color: '#0f1f3d', lineHeight: 1, fontFamily: "'DM Serif Display',serif" }}>$149</div>
           <div style={{ fontSize: 14, color: '#6b7280', marginTop: 4 }}>one-time payment</div>
           <div style={{ fontSize: 13, color: '#6b7280', margin: '14px 0 20px', lineHeight: 1.5 }}>Run a single assessment right now. No subscription required.</div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 10, flexGrow: 1 }}>
@@ -110,3 +110,4 @@ export default function PricingPage() {
     </div>
   )
 }
+
