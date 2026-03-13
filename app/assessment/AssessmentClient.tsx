@@ -30,6 +30,25 @@ const LEVEL_COLORS: Record<string, string> = {
   '3': '#16a34a',
 }
 
+
+const GLOSSARY_TERMS: { term: string; full: string; def: string }[] = [
+  { term: 'TPS', full: 'Trade Partner/Supplier', def: 'The subcontractors and material vendors (framers, plumbers, electricians, roofers, etc.) who perform work on your job sites.' },
+  { term: 'ERP', full: 'Enterprise Resource Planning', def: 'Your central business software that manages purchasing, scheduling, accounting, and job costing in one platform (e.g., BuilderTREND, CoConstruct, Sage, Hyphen).' },
+  { term: 'CRM', full: 'Customer Relationship Management', def: 'Software that tracks leads, prospects, and customer communications throughout the sales pipeline.' },
+  { term: 'BIM', full: 'Building Information Modeling', def: 'A 3D digital model containing design, schedule, and cost data. 4D BIM adds time/schedule; 5D BIM adds cost.' },
+  { term: 'DfMA', full: 'Design for Manufacturing & Assembly', def: 'Designing home components to be built off-site and assembled on the lot, rather than constructed from scratch on-site.' },
+  { term: 'Digital Twin', full: 'Digital Twin', def: 'A live digital replica of the completed home tied to its actual systems — delivered at closing for ongoing management, warranty, and smart home control.' },
+  { term: 'AP', full: 'Accounts Payable', def: 'The internal function responsible for processing and paying invoices and purchase orders to trade partners and suppliers.' },
+  { term: 'PO / WO', full: 'Purchase Order / Work Order', def: 'A PO is a formal commitment to buy specific labor or materials. A WO instructs a specific task to be performed. Both define scope and price before work begins.' },
+  { term: 'G&A', full: 'General & Administrative', def: 'Overhead costs not tied to a specific job — office rent, staff salaries, insurance, software subscriptions, etc.' },
+  { term: 'EFT', full: 'Electronic Funds Transfer', def: 'Direct bank-to-bank payment (ACH) instead of mailing a paper check.' },
+  { term: 'JIT', full: 'Just-In-Time', def: 'Ordering materials and scheduling labor to arrive exactly when needed, minimizing waste and on-site storage.' },
+  { term: 'QC', full: 'Quality Control', def: 'Inspecting completed work against defined standards before approving payment or moving to the next phase.' },
+  { term: 'KPI', full: 'Key Performance Indicator', def: 'A measurable metric to track business performance — e.g., cycle time, defect rate, or customer satisfaction score.' },
+  { term: 'Stakeout', full: 'Stakeout', def: 'The surveying step where lot boundaries and foundation footprint are physically marked on the ground before construction begins.' },
+  { term: 'AI / ML', full: 'Artificial Intelligence / Machine Learning', def: 'Software that learns from data to automate decisions — e.g., optimizing schedules, predicting buyer behavior, or flagging quality issues.' },
+]
+
 function getScoreColor(pct: number): string {
   if (pct < 25) return '#dc2626'
   if (pct < 50) return '#f59e0b'
@@ -60,6 +79,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   const [showCompletion, setShowCompletion] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [showResumeBanner, setShowResumeBanner] = useState(false)
+  const [showGlossary, setShowGlossary] = useState(false)
   const [draftData, setDraftData] = useState<{ answers: Record<string, string>; companyInfo: CompanyInfo } | null>(null)
 
   // Load draft on mount
@@ -173,7 +193,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
   const domainProgress = currentQ - domainStartIdx + 1
   const domainTotal = currentDomain?.questions.length || 0
 
-  // Ã¢ÂÂÃ¢ÂÂ COMPANY INFO SCREEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ COMPANY INFO SCREEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   if (screen === 'company') {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
@@ -311,7 +331,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
     )
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ ASSESSMENT SCREEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ ASSESSMENT SCREEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
       {/* Sticky header */}
@@ -326,6 +346,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <span style={{ fontSize: 12, color: '#9ca3af' }}>{answeredCount} of {TOTAL} answered</span>
+          <button onClick={() => setShowGlossary(true)} style={{ fontSize: 12, color: '#1d4ed8', background: 'none', border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Glossary</button>
             {answeredCount >= 10 && (
               <button
                 onClick={handleSubmit}
@@ -468,7 +489,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
             }}
           >
             <span style={{ fontSize: 12, fontWeight: 700, background: answers[currentQuestion.id] === 'na' ? 'rgba(255,255,255,0.3)' : '#e5e7eb', borderRadius: 4, padding: '2px 6px' }}>N/A</span>
-            Not applicable to my business — excluded from scoring
+            Not applicable to my business â excluded from scoring
           </button>
         </div>
 
@@ -522,6 +543,32 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
         </div>
       </main>
 
+      {/* Glossary modal */}
+      {showGlossary && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,31,61,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '24px' }}>
+          <div style={{ background: '#fff', borderRadius: 18, maxWidth: 600, width: '100%', maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 80px rgba(0,0,0,0.3)' }}>
+            <div style={{ padding: '24px 28px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <div>
+                <h2 style={{ fontFamily: "'DM Serif Display',serif", fontSize: 22, fontWeight: 400, color: '#0f1f3d', margin: 0 }}>Glossary</h2>
+                <p style={{ fontSize: 13, color: '#6b7280', margin: '2px 0 0' }}>Industry terms used throughout this assessment</p>
+              </div>
+              <button onClick={() => setShowGlossary(false)} style={{ width: 32, height: 32, borderRadius: '50%', border: '1px solid #e5e7eb', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#6b7280', flexShrink: 0 }}>×</button>
+            </div>
+            <div style={{ overflowY: 'auto', padding: '16px 28px 24px' }}>
+              {GLOSSARY_TERMS.map(({ term, full, def }) => (
+                <div key={term} style={{ paddingBottom: 16, marginBottom: 16, borderBottom: '1px solid #f3f4f6' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0f1f3d', background: '#eff6ff', borderRadius: 5, padding: '2px 8px', flexShrink: 0 }}>{term}</span>
+                    {full !== term && <span style={{ fontSize: 13, color: '#6b7280', fontStyle: 'italic' }}>{full}</span>}
+                  </div>
+                  <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.6 }}>{def}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Completion screen */}
       {showCompletion && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,31,61,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '24px' }}>
@@ -538,7 +585,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
                 onClick={handleSubmit}
                 style={{ backgroundColor: '#0f1f3d', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, padding: '14px 0', borderRadius: 10, width: '100%' }}
               >
-                View Results â
+                View Results Ã¢ÂÂ
               </button>
               <button
                 onClick={() => { setShowCompletion(false); setCurrentQ(0); }}
