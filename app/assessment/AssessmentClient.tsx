@@ -588,7 +588,7 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
                 onClick={handleSubmit}
                 style={{ backgroundColor: '#0f1f3d', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, padding: '14px 0', borderRadius: 10, width: '100%' }}
               >
-                View Results ÃÂ¢ÃÂÃÂ
+                View Results →
               </button>
               <button
                 onClick={() => { setShowCompletion(false); setCurrentQ(0); }}
