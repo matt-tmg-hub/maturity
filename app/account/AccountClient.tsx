@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -24,6 +23,7 @@ export default function AccountClient({ user, subscription }: { user: any; subsc
 
   const assessmentsUsed = subscription?.assessments_used ?? 0
   const assessmentsLimit = subscription?.assessments_limit
+  const onetimeUsed = subscription?.plan_type === 'onetime' && assessmentsUsed >= (assessmentsLimit ?? 1)
 
   const handleManageBilling = async () => {
     setLoading(true)
@@ -80,13 +80,9 @@ export default function AccountClient({ user, subscription }: { user: any; subsc
             </div>
             <div className="flex justify-between py-3">
               <span className="text-gray-500 text-sm">Status</span>
-              <span
-                className={`text-sm font-semibold capitalize px-2 py-0.5 rounded-full ${
-                  subscription?.status === 'active'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-600'
-                }`}
-              >
+              <span className={`text-sm font-semibold capitalize px-2 py-0.5 rounded-full ${
+                subscription?.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
+              }`}>
                 {subscription?.status ?? 'None'}
               </span>
             </div>
@@ -106,6 +102,20 @@ export default function AccountClient({ user, subscription }: { user: any; subsc
             )}
           </div>
         </div>
+
+        {/* Upgrade prompt when one-time assessment is used up */}
+        {onetimeUsed && (
+          <div className="bg-[#0f1e3d] rounded-xl p-6 mb-5 text-center">
+            <p className="text-white font-semibold text-sm mb-1">Ready for another assessment?</p>
+            <p className="text-white/60 text-xs mb-4">Buy another single assessment or upgrade to annual for unlimited retakes and history tracking.</p>
+            <Link
+              href="/pricing"
+              className="inline-block bg-[#f59e0b] text-[#0f1e3d] font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-[#fbbf24] transition-colors"
+            >
+              View Plans &rarr;
+            </Link>
+          </div>
+        )}
 
         {/* Manage Billing Button */}
         {subscription?.stripe_customer_id ? (
