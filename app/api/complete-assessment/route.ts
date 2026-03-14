@@ -1,3 +1,5 @@
+export const maxDuration = 60
+
 import { createClient } from '@/lib/supabase/server'
 import { calculateScores, getLevelFromScore } from '@/lib/scoring'
 import { DOMAINS } from '@/lib/maturityData'
@@ -76,11 +78,12 @@ function buildPrompt(
       return (scoreMap[a.ans] ?? 0) - (scoreMap[b.ans] ?? 0)
     })
 
-    questionScores.forEach(({ q, ans }) => {
+    // Only include top 4 lowest questions per domain to keep prompt lean
+    questionScores.slice(0, 4).forEach(({ q, ans }) => {
       const nextLevel = getNextLevel(ans)
       if (!nextLevel) return
-      const currentDesc = q.levels[ans] ?? ''
-      const nextDesc = q.levels[nextLevel] ?? ''
+      const currentDesc = (q.levels[ans] ?? '').slice(0, 120)
+      const nextDesc = (q.levels[nextLevel] ?? '').slice(0, 120)
       gapAnalysis += `\n**${q.label}** (Level ${ans} → Level ${nextLevel})\n`
       gapAnalysis += `Now: ${currentDesc}\n`
       gapAnalysis += `Next: ${nextDesc}\n`
@@ -168,7 +171,7 @@ function getFallbackRecommendations(
 async function getAIRecommendations(prompt: string): Promise<string> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('AI_TIMEOUT')), 25000)
+    setTimeout(() => reject(new Error('AI_TIMEOUT')), 55000)
   )
   const aiPromise = anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
