@@ -14,7 +14,7 @@ const AssessmentSchema = z.object({
   }),
   answers: z.record(
     z.string(),
-    z.enum(['-1', '0', '1', '2', '3']).nullable()
+    z.enum(['-1', '0', '1', '2', '3', 'na']).nullable()
   ),
   assessmentId: z.string().uuid().nullable().optional(),
 })
