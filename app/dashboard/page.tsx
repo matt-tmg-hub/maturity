@@ -76,7 +76,7 @@ function DashboardInner() {
           <div><span style={{fontSize:15,fontWeight:700,color:'#0f1f3d',display:'block',lineHeight:1.2}}>Builder Maturity</span><span style={{fontSize:10,color:'#9ca3af',display:'block',lineHeight:1}}>by The Mainspring Group</span></div>
         </a>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <a href="/account" style={{fontSize:13,color:'#374151',textDecoration:'none',fontWeight:500}}>Account</a>
+          
           <button onClick={handleSignOut} disabled={signingOut} style={{fontSize:13,fontWeight:500,padding:'7px 16px',borderRadius:7,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',cursor:'pointer'}}>{signingOut ? 'Signing out...' : 'Sign out'}</button>
         </div>
       </nav>
