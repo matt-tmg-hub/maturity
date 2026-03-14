@@ -345,6 +345,13 @@ export default function AssessmentClient({ userId, editAnswers, editCompanyInfo,
             <button onClick={() => { try { localStorage.setItem('bm_saved','1') } catch(e){} window.location.href = '/dashboard' }} style={{ fontSize: 12, color: '#16a34a', background: 'none', border: '1px solid #bbf7d0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Save &amp; Exit</button>
             <span style={{ fontSize: 12, color: '#9ca3af' }}>{answeredCount}/{TOTAL}</span>
             
+            <button
+              onClick={() => setShowGlossary(true)}
+              style={{ fontSize: 12, color: '#1d4ed8', background: 'none', border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600 }}
+            >
+              Glossary
+            </button>
+
             {answeredCount >= 10 && (
               <button
                 onClick={handleSubmit}
