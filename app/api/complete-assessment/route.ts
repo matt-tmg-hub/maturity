@@ -27,25 +27,19 @@ function getNextLevel(currentLevel: string): string | null {
 function identifyPriorityDomains(domainScores: ReturnType<typeof calculateScores>['domainScores']) {
   const scored = Object.values(domainScores).filter(d => d.answered > 0)
   const avg = scored.reduce((sum, d) => sum + d.pct, 0) / scored.length
-
-  // Sort lowest to highest
   const sorted = [...scored].sort((a, b) => a.pct - b.pct)
-
-  // Determine if domains are clustered (all within 15 points of each other)
   const spread = sorted[sorted.length - 1].pct - sorted[0].pct
   const isClustered = spread <= 15
 
-  // Priority domains: below 37.5% (Anchor/Typical) OR more than 15 pts below average
-  // Hard floor: always flag anything below 37.5% regardless
   const priorityDomains = isClustered
-    ? sorted // all are roughly equal — treat all as priorities
-    : sorted.filter(d => d.pct < 37.5 || d.pct < avg - 15)
+    ? sorted.slice(0, 3)
+    : sorted.filter(d => d.pct < 37.5 || d.pct < avg - 15).slice(0, 2)
 
-  // Cap at 2 priority domains to keep advice actionable
-  // If clustered, still cap at 2-3 most impactful
-  const focusDomains = isClustered ? sorted.slice(0, 3) : priorityDomains.slice(0, 2)
+  // If two focus domains are within 10 points — treat as parallel priorities (different teams, same timeframe)
+  const twoDomainsClose = priorityDomains.length >= 2 &&
+    (priorityDomains[1].pct - priorityDomains[0].pct) <= 10
 
-  return { focusDomains, isClustered, avg: Math.round(avg), spread }
+  return { focusDomains: priorityDomains, isClustered, twoDomainsClose, avg: Math.round(avg) }
 }
 
 function buildPrompt(
@@ -57,9 +51,9 @@ function buildPrompt(
   const level = getLevelFromScore(overall)
   const sorted = Object.values(domainScores).filter(d => d.answered > 0).sort((a, b) => a.pct - b.pct)
   const highest = sorted[sorted.length - 1]
-  const { focusDomains, isClustered, avg } = identifyPriorityDomains(domainScores)
+  const { focusDomains, isClustered, twoDomainsClose, avg } = identifyPriorityDomains(domainScores)
 
-  // Build gap analysis ONLY for focus domains — current level + next level from the model
+  // Gap analysis — focus domains only, lowest questions first
   let gapAnalysis = ''
   DOMAINS.forEach(domain => {
     const domainScore = domainScores[domain.key]
@@ -68,9 +62,8 @@ function buildPrompt(
 
     const isPrimary = focusDomains[0].domainName === domainScore.domainName
     gapAnalysis += `\n\n### ${domain.name} — ${domainScore.pct}% (${getLevelFromScore(domainScore.pct).name})`
-    gapAnalysis += isPrimary ? ' ← PRIMARY FOCUS\n' : '\n'
+    gapAnalysis += twoDomainsClose ? ' ← PARALLEL PRIORITY\n' : isPrimary ? ' ← PRIMARY FOCUS\n' : ' ← SECONDARY (address after primary is moving)\n'
 
-    // Find the lowest scoring questions within this domain first
     const questionScores: { q: typeof domain.questions[0], ans: string }[] = []
     domain.questions.forEach(q => {
       const ans = answers[q.id]
@@ -78,7 +71,6 @@ function buildPrompt(
       questionScores.push({ q, ans })
     })
 
-    // Sort questions lowest score first
     questionScores.sort((a, b) => {
       const scoreMap: Record<string, number> = { '-1': 0, '0': 1, '1': 2, '2': 3, '3': 4 }
       return (scoreMap[a.ans] ?? 0) - (scoreMap[b.ans] ?? 0)
@@ -87,10 +79,8 @@ function buildPrompt(
     questionScores.forEach(({ q, ans }) => {
       const nextLevel = getNextLevel(ans)
       if (!nextLevel) return
-
       const currentDesc = q.levels[ans] ?? ''
       const nextDesc = q.levels[nextLevel] ?? ''
-
       gapAnalysis += `\n**${q.label}** (Level ${ans} → Level ${nextLevel})\n`
       gapAnalysis += `Now: ${currentDesc}\n`
       gapAnalysis += `Next: ${nextDesc}\n`
@@ -102,8 +92,29 @@ function buildPrompt(
     .join('\n')
 
   const focusContext = isClustered
-    ? `All domains are clustered within a narrow range (avg ${avg}%). No single domain is dramatically worse than others — focus on raising the floor across all areas.`
-    : `Focus domains are meaningfully below the average of ${avg}%: ${focusDomains.map(d => `${d.domainName} at ${d.pct}%`).join(', ')}.`
+    ? `All domains are within a narrow range (avg ${avg}%). No single domain is dramatically worse — focus on raising the floor across all areas.`
+    : twoDomainsClose
+    ? `Two domains are essentially tied at the bottom and should be treated as PARALLEL priorities: ${focusDomains.map(d => `${d.domainName} at ${d.pct}%`).join(' and ')}. These likely involve different teams so both can be worked simultaneously in the next 90 days.`
+    : `One domain is clearly the primary focus: ${focusDomains[0]?.domainName} at ${focusDomains[0]?.pct}%. ${focusDomains.length > 1 ? `${focusDomains[1]?.domainName} at ${focusDomains[1]?.pct}% should be addressed after the primary is moving (days 90-180).` : ''}`
+
+  // Per-domain section instructions for the prompt
+  const domainSectionInstructions = focusDomains.map((fd, i) => {
+    const timing = twoDomainsClose
+      ? `Next 90 Days`
+      : i === 0
+      ? `First 90 Days`
+      : `Days 90–180 (after ${focusDomains[0].domainName} is moving)`
+
+    return `
+<h4>${twoDomainsClose ? 'Priority' : i === 0 ? 'Your #1 Priority' : 'Also Needs Attention'}: ${fd.domainName}</h4>
+[Write 1 focused paragraph on this domain. Reference the specific questions where they scored lowest. Describe what they're doing today and what the next level looks like — use the gap analysis content but write it in your own words, conversationally. Explain why this matters to their business. Keep it to the point.]
+
+<h4>${fd.domainName} — Action Plan (${timing})</h4>
+[Write 3-4 concrete actions specific to this domain. Each action must be something a specific person on this team can own and execute — not a concept. Lead with the most impactful. Base each action directly on the gap analysis for this domain. Format as a numbered list with <br/> between items.]
+
+<h4>You'll Know You're There When... (${fd.domainName})</h4>
+[Write 3-4 outcome milestone statements. Each starts with "You'll know you're there when..." and describes a concrete, observable condition that signals they've reached the next level. Derive these from the "Next" level descriptions in the gap analysis but rewrite them as real-world indicators — not copy-paste from the model. They should feel like advice from a smart industry insider.]`
+  }).join('\n')
 
   return `You are an expert operational advisor for residential homebuilders. Give specific, actionable guidance — not generic advice. Every recommendation must tie directly to the gap analysis below.
 
@@ -119,29 +130,21 @@ Strongest domain: ${highest?.domainName} at ${highest?.pct}%
 
 ---
 GAP ANALYSIS — Where They Are Now vs. What the Next Level Looks Like:
-This is the maturity model content. Use it directly. Do not generalize — reference the specific gaps below when writing recommendations.
+Use this directly. Do not generalize. Reference specific gaps when writing recommendations. Do not copy-paste the descriptions verbatim — translate them into plain, practical language.
 ${gapAnalysis}
 ---
 
-Write a focused assessment with these sections. A builder can only realistically act on a handful of things in the 6 months before their next assessment — so keep the advice tight, prioritized, and achievable. Do not pad. Do not give equal weight to areas that are not equal problems.
+Write the assessment using exactly these sections. A builder can only realistically act on a handful of things in the 6 months before their next assessment — keep advice tight, prioritized, and achievable. Do not pad. Keep each domain's advice separate so different team members can own their section.
 
 <h4>Where You Stand</h4>
-<p>2-3 sentences. Name their level, what it means day-to-day, and the single biggest thing holding them back operationally.</p>
+[2-3 sentences. Name their level, what it means day-to-day, and the single biggest operational constraint holding them back. Be direct.]
+${domainSectionInstructions}
 
-<h4>Your #1 Priority: ${focusDomains[0]?.domainName ?? 'Top Focus Area'}</h4>
-<p>Deep focus on the lowest/weakest domain. Reference the specific questions where they scored lowest. Tell them exactly what they're doing today and what the next level looks like — use the gap analysis language directly, in plain English. Explain why this domain is the highest-leverage place to improve.</p>
+<h4>Protect Your Strength: ${highest?.domainName}</h4>
+[1-2 sentences. Acknowledge what they're doing well and briefly note how this strength can support improvement in the weaker areas.]
 
-${focusDomains.length > 1 ? `<h4>${isClustered ? 'Also Focus On' : 'Also Needs Attention'}: ${focusDomains[1]?.domainName ?? ''}</h4>
-<p>Same treatment for the second focus domain. Specific, tied to the gap analysis. Don't repeat advice already given above.</p>
-
-` : ''}<h4>Your Action Plan for the Next 6 Months</h4>
-<p>3-5 concrete actions tied directly to moving from their current level to the next level in the priority domain(s). Each action should be something a homebuilder CEO can actually assign, schedule, or implement — not a concept. Lead with the most impactful. Format as a numbered list using <br/> between items.</p>
-
-<h4>Protect Your Strength: ${highest?.domainName ?? ''}</h4>
-<p>1-2 sentences. Acknowledge what they're doing well and briefly note how this strength can support improvement in their weaker areas.</p>
-
-Tone: Direct, practical, written for a homebuilder CEO. No filler. Reference the maturity level names (Anchor, Typical, Strategic Implementer, Adaptive Innovator, Guiding Star) where relevant.
-Format with <h4> headers and <p> tags throughout.`
+Tone: Direct, practical, written for a homebuilder CEO. No filler. Reference maturity level names (Anchor, Typical, Strategic Implementer, Adaptive Innovator, Guiding Star) where relevant.
+Format with <h4> headers and <p> tags. Use <br/> between numbered action items.`
 }
 
 function getFallbackRecommendations(
@@ -151,11 +154,15 @@ function getFallbackRecommendations(
 ) {
   const level = getLevelFromScore(overall)
   const sorted = Object.values(domainScores).filter(d => d.answered > 0).sort((a, b) => a.pct - b.pct)
-  const lowest = sorted[0]
   const highest = sorted[sorted.length - 1]
-  const { focusDomains, isClustered } = identifyPriorityDomains(domainScores)
+  const { focusDomains, twoDomainsClose } = identifyPriorityDomains(domainScores)
 
-  return `<h4>Overall Standing</h4><p>${companyInfo.company} scored ${overall}%, placing you at the <strong>${level.name}</strong> level — '${level.sentiment}'. ${overall < 50 ? 'There are significant opportunities to systematize operations and reduce reactive firefighting.' : 'You are ahead of most builders. Focus now on the gaps pulling your overall score down.'}</p><h4>Priority Area</h4><p>Your lowest-scoring domain is <strong>${lowest?.domainName} at ${lowest?.pct}%</strong>. This is where improvement will have the greatest operational impact.</p>${focusDomains.length > 1 ? `<h4>${isClustered ? 'Also Focus On' : 'Also Needs Attention'}</h4><p>${focusDomains.slice(1).map(d => `<strong>${d.domainName} at ${d.pct}%</strong>`).join(' and ')} also ${focusDomains.length === 2 ? 'requires' : 'require'} attention in the next 6 months.</p>` : ''}<h4>Action Plan</h4><p>1. Document your current process in ${lowest?.domainName} — write down what actually happens today.<br/>2. Pick the one or two questions in that domain where you scored lowest and assign a named person to own the improvement.<br/>3. Set a 90-day target: what does Level ${getNextLevel(getLevelFromScore(lowest?.pct ?? 0).key) ?? '1'} look like for your business specifically?</p><h4>Strongest Area</h4><p>Your strongest domain is <strong>${highest?.domainName} at ${highest?.pct}%</strong>. This is a real competitive advantage — make sure it is visible to your customers and trade partners.</p>`
+  const domainFallbacks = focusDomains.map((fd, i) => {
+    const timing = twoDomainsClose ? 'Next 90 Days' : i === 0 ? 'First 90 Days' : 'Days 90–180'
+    return `<h4>${fd.domainName} — Action Plan (${timing})</h4><p>1. Document your current process in ${fd.domainName} — write down exactly what happens today.<br/>2. Identify the two lowest-scoring questions in this domain and assign a named person to own each improvement.<br/>3. Set a clear target: define what the next level looks like for your business specifically.</p><h4>You'll Know You're There When... (${fd.domainName})</h4><p>You'll know you're there when your team can describe your ${fd.domainName} process without hesitation.<br/>You'll know you're there when exceptions in this area are rare and handled by your system, not by you personally.<br/>You'll know you're there when the people responsible for this domain stop firefighting and start operating proactively.</p>`
+  }).join('')
+
+  return `<h4>Where You Stand</h4><p>${companyInfo.company} scored ${overall}%, placing you at the <strong>${level.name}</strong> level — '${level.sentiment}'. ${overall < 50 ? 'There are significant opportunities to systematize operations and reduce reactive firefighting.' : 'You are ahead of most builders. Focus now on the gaps pulling your overall score down.'}</p>${domainFallbacks}<h4>Protect Your Strength: ${highest?.domainName}</h4><p>Your strongest domain is <strong>${highest?.domainName} at ${highest?.pct}%</strong>. Use the discipline that got you here to drive improvement in your weaker areas.</p>`
 }
 
 async function getAIRecommendations(prompt: string): Promise<string> {
