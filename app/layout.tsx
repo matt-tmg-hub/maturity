@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "Builder Maturity | The Mainspring Group",
   description: "Assess and benchmark your home building business maturity across 6 key domains.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/favicon.png",
   },
 };
 
