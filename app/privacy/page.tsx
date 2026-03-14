@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       </nav>
       <div style={{maxWidth:760,margin:'0 auto',padding:'48px 24px 80px'}}>
         <h1 style={{fontFamily:"'DM Serif Display',serif",fontSize:32,color:'#0f1f3d',marginBottom:8}}>Privacy Policy</h1>
-        <p style={{fontSize:13,color:'#9ca3af',marginBottom:32}}>Last Updated: July 27, 2024</p>
+        <p style={{fontSize:13,color:'#9ca3af',marginBottom:32}}>Last Updated: March 13, 2025</p>
         <div style={{fontSize:14,color:'#374151',lineHeight:1.8}}>
           <p style={{marginBottom:16}}>This Privacy Policy describes how The Mainspring Group, LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;) collects, uses, and discloses your information when you use the Builder Maturity Assessment Service at buildermaturity.com.</p>
           <p style={{marginBottom:24}}><strong>Company:</strong> The Mainspring Group, LLC, 780 Newtown-Yardley Rd, Suite 310A, Newtown, PA 18940 &mdash; <a href="mailto:hello@themainspringgroup.com" style={{color:'#1d4ed8'}}>hello@themainspringgroup.com</a></p>
