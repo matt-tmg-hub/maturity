@@ -12,7 +12,7 @@ export default function TermsPage() {
       </nav>
       <div style={{maxWidth:760,margin:'0 auto',padding:'48px 24px 80px'}}>
         <h1 style={{fontFamily:"'DM Serif Display',serif",fontSize:32,color:'#0f1f3d',marginBottom:8}}>Terms of Use</h1>
-        <p style={{fontSize:13,color:'#9ca3af',marginBottom:32}}>Version 1.0 &mdash; Last Updated: January 10, 2024 &mdash; Effective: November 18, 2024</p>
+        <p style={{fontSize:13,color:'#9ca3af',marginBottom:32}}>Version 1.0 &mdash; Last Updated: March 13, 2025 &mdash; Effective: March 13, 2025</p>
         <div style={{fontSize:14,color:'#374151',lineHeight:1.8}}>
           <p style={{marginBottom:16}}>These Terms of Use are a legally binding agreement between you and The Mainspring Group, LLC. They govern your use of the Builder Maturity Assessment platform at buildermaturity.com.</p>
           <p style={{marginBottom:24,fontWeight:600}}>PLEASE READ THESE TERMS CAREFULLY. THEY CONTAIN A BINDING ARBITRATION AGREEMENT AND CLASS ACTION WAIVER.</p>
