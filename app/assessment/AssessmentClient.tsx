@@ -114,7 +114,7 @@ export default function AssessmentClient({
           version: 1, supabaseDraftId, currentQ
         }))
       } catch {}
-      // Supabase save â only if not in edit mode
+      // Supabase save Ã¢ÂÂ only if not in edit mode
       if (!editAssessmentId && Object.keys(answers).length > 0) {
         try {
           const res = await fetch('/api/save-draft', {
@@ -237,7 +237,7 @@ export default function AssessmentClient({
   const domainProgress = currentQ - domainStartIdx + 1
   const domainTotal = currentDomain?.questions.length || 0
 
-  // ââ COMPANY INFO SCREEN ââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ COMPANY INFO SCREEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   if (screen === 'company') {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
@@ -328,7 +328,7 @@ export default function AssessmentClient({
     )
   }
 
-  // ââ ASSESSMENT SCREEN ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // Ã¢ÂÂÃ¢ÂÂ ASSESSMENT SCREEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
       <style>{`
@@ -471,34 +471,7 @@ export default function AssessmentClient({
           </button>
         </div>
 
-        {/* Navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
-          <button onClick={() => setCurrentQ(q => Math.max(0, q - 1))} disabled={currentQ === 0}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: currentQ === 0 ? '#d1d5db' : '#374151', cursor: currentQ === 0 ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 500 }}>
-            &larr; Previous
-          </button>
-          <div style={{ display: 'flex', gap: 6, flexDirection: 'column', alignItems: 'flex-end' }}>
-            {!answers[currentQuestion?.id] && (
-              <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 600 }}>Select an answer to continue</span>
-            )}
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                onClick={handleNextClick}
-                className={nextShake ? 'next-shake' : ''}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: `1px solid ${answers[currentQuestion?.id] ? '#e5e7eb' : '#fcd34d'}`, borderRadius: 8, background: answers[currentQuestion?.id] ? '#fff' : '#fffbeb', color: answers[currentQuestion?.id] ? '#374151' : '#92400e', cursor: currentQ === TOTAL - 1 ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 500, opacity: currentQ === TOTAL - 1 ? 0.4 : 1 }}>
-                Next &rarr;
-              </button>
-              {answeredCount >= 10 && (
-                <button onClick={() => { setShowCompletion(false); handleSubmit(); }} disabled={submitting}
-                  style={{ padding: '9px 20px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
-                  {submitting ? 'Saving...' : 'View Results'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Progress Map â NOW ABOVE nav, with jump-to-unanswered */}
+        {/* Progress Map Ã¢ÂÂ NOW ABOVE nav, with jump-to-unanswered */}
         <div style={{ marginTop: 24, padding: '16px 20px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Progress Map</p>
@@ -532,6 +505,34 @@ export default function AssessmentClient({
           </div>
           <p style={{ fontSize: 11, color: '#9ca3af', margin: '10px 0 0' }}>Click any square to jump to that question</p>
         </div>
+
+        {/* Navigation */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+          <button onClick={() => setCurrentQ(q => Math.max(0, q - 1))} disabled={currentQ === 0}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: currentQ === 0 ? '#d1d5db' : '#374151', cursor: currentQ === 0 ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 500 }}>
+            &larr; Previous
+          </button>
+          <div style={{ display: 'flex', gap: 6, flexDirection: 'column', alignItems: 'flex-end' }}>
+            {!answers[currentQuestion?.id] && (
+              <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 600 }}>Select an answer to continue</span>
+            )}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                onClick={handleNextClick}
+                className={nextShake ? 'next-shake' : ''}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: answers[currentQuestion?.id] ? '#374151' : '#d1d5db', cursor: answers[currentQuestion?.id] ? 'pointer' : 'default', fontSize: 13, fontWeight: 500, opacity: currentQ === TOTAL - 1 ? 0.4 : 1 }}>
+                Next &rarr;
+              </button>
+              {answeredCount >= 10 && (
+                <button onClick={() => { setShowCompletion(false); handleSubmit(); }} disabled={submitting}
+                  style={{ padding: '9px 20px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
+                  {submitting ? 'Saving...' : 'View Results'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
       </main>
 
       {/* Glossary modal */}
