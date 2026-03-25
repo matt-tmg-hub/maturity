@@ -114,7 +114,7 @@ export default function AssessmentClient({
           version: 1, supabaseDraftId, currentQ
         }))
       } catch {}
-      // Supabase save — only if not in edit mode
+      // Supabase save â only if not in edit mode
       if (!editAssessmentId && Object.keys(answers).length > 0) {
         try {
           const res = await fetch('/api/save-draft', {
@@ -237,7 +237,7 @@ export default function AssessmentClient({
   const domainProgress = currentQ - domainStartIdx + 1
   const domainTotal = currentDomain?.questions.length || 0
 
-  // ── COMPANY INFO SCREEN ──────────────────────────────────────────────────
+  // ââ COMPANY INFO SCREEN ââââââââââââââââââââââââââââââââââââââââââââââââââ
   if (screen === 'company') {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
@@ -328,7 +328,7 @@ export default function AssessmentClient({
     )
   }
 
-  // ── ASSESSMENT SCREEN ────────────────────────────────────────────────────
+  // ââ ASSESSMENT SCREEN ââââââââââââââââââââââââââââââââââââââââââââââââââââ
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter',sans-serif" }}>
       <style>{`
@@ -477,7 +477,7 @@ export default function AssessmentClient({
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: currentQ === 0 ? '#d1d5db' : '#374151', cursor: currentQ === 0 ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 500 }}>
             &larr; Previous
           </button>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 6, flexDirection: 'column', alignItems: 'flex-end' }}>
             {!answers[currentQuestion?.id] && (
               <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 600 }}>Select an answer to continue</span>
             )}
@@ -498,7 +498,7 @@ export default function AssessmentClient({
           </div>
         </div>
 
-        {/* Progress Map — NOW ABOVE nav, with jump-to-unanswered */}
+        {/* Progress Map â NOW ABOVE nav, with jump-to-unanswered */}
         <div style={{ marginTop: 24, padding: '16px 20px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>Progress Map</p>
