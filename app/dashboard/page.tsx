@@ -55,6 +55,7 @@ function DashboardInner() {
       const { data: sub } = await supabase.from('subscriptions').select('*').eq('user_id', authUser.id).eq('status', 'active').order('created_at', { ascending: false }).limit(1).single()
       const { data: asmts } = await supabase.from('assessments').select('id, company_name, overall_score, maturity_level, maturity_level_key, domain_scores, completed_at, created_at, status, current_question_index').eq('user_id', authUser.id).order('created_at', { ascending: false }).limit(25)
       const completed = (asmts || []).filter(a => a.status === 'complete')
+      const draft2 = (asmts || []).find(a => a.status === 'in_progress') || null
       const draft = (asmts || []).find(a => a.status === 'in_progress') || null
       setUser(profile || { id: authUser.id, email: authUser.email || '', full_name: null, company_name: null, title: null })
       setSubscription(sub || null)
@@ -75,8 +76,12 @@ function DashboardInner() {
     setDeletingDraft(true)
     try {
       const supabase = createClient()
-      await supabase.from('assessments').delete().eq('id', inProgress.id)
-      // Also clear localStorage draft
+      const { error } = await supabase.from('assessments').delete().eq('id', inProgress.id)
+      if (error) {
+        // Fallback: mark as abandoned via update if delete is blocked by RLS
+        await supabase.from('assessments').update({ status: 'abandoned' }).eq('id', inProgress.id)
+      }
+      // Clear localStorage draft
       if (typeof window !== 'undefined') {
         const keys = Object.keys(localStorage).filter(k => k.startsWith('bm_draft_'))
         keys.forEach(k => localStorage.removeItem(k))
@@ -100,8 +105,11 @@ function DashboardInner() {
   const isExpiringSoon = expiryDate ? (expiryDate.getTime() - Date.now()) < 7*24*60*60*1000 && expiryDate > new Date() : false
   const latestAssessment = assessments[0] || null
 
-  // 7-day modify window based on when each assessment was completed
-  const canModify = (a: Assessment) => isAnnual || isWithin7Days(a.completed_at || a.created_at)
+  // Annual: always can modify. Onetime: 7 days from completion
+  const canModify = (a: Assessment) => {
+    if (isAnnual) return true
+    return isWithin7Days(a.completed_at || a.created_at)
+  }
 
   return (
     <div style={{minHeight:'100vh',background:'#f9fafb',fontFamily:"'Inter',sans-serif"}}>
@@ -158,7 +166,7 @@ function DashboardInner() {
               <div>
                 <p style={{fontSize:14,fontWeight:700,color:'#92400e',margin:'0 0 2px'}}>Assessment In Progress</p>
                 <p style={{fontSize:13,color:'#b45309',margin:0}}>
-                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused — answers have been saved'}. Pick up right where you left off.
+                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused â answers have been saved'}. Pick up right where you left off.
                 </p>
               </div>
             </div>
@@ -251,7 +259,7 @@ function DashboardInner() {
           </>
         )}
 
-        {/* Assessment history — all completed + in-progress draft */}
+        {/* Assessment history â all completed + in-progress draft */}
         {(assessments.length > 1 || inProgress) && (
           <>
             <h2 style={{fontSize:16,fontWeight:700,color:'#111827',marginBottom:12}}>Assessment History</h2>
@@ -264,9 +272,9 @@ function DashboardInner() {
               {inProgress && (
                 <div style={{display:'flex',alignItems:'center',padding:'12px 20px',borderBottom:'1px solid #f3f4f6',gap:8,background:'#fffbeb'}}>
                   <span style={{flex:2,color:'#b45309',fontSize:13}}>{formatDate(inProgress.created_at)} <span style={{fontSize:10,fontWeight:600,background:'#fef3c7',color:'#92400e',padding:'1px 6px',borderRadius:4,marginLeft:4}}>IN PROGRESS</span></span>
-                  <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || '—'}</span>
+                  <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || 'â'}</span>
                   <span style={{flex:1,textAlign:'center',color:'#9ca3af',fontSize:13}}>
-                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : '—'}
+                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : 'â'}
                   </span>
                   <span style={{flex:2,fontSize:12,color:'#b45309'}}>Not completed</span>
                   <span style={{flex:1,textAlign:'right',display:'flex',gap:8,justifyContent:'flex-end'}}>
