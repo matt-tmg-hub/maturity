@@ -26,7 +26,7 @@ export default async function AssessmentPage({
   if (!sub) redirect('/pricing')
 
   // Check if onetime and already used
-  if (sub.plan_type === 'onetime') {
+  if (sub.plan_type === 'onetime' && !edit) {
     const used = sub.assessments_used ?? 0
     const limit = sub.assessments_limit ?? 1
     if (used >= limit) redirect('/dashboard?used=1')
