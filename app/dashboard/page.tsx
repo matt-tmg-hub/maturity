@@ -133,7 +133,7 @@ function DashboardInner() {
               <div>
                 <p style={{fontSize:14,fontWeight:700,color:'#92400e',margin:'0 0 2px'}}>Assessment In Progress</p>
                 <p style={{fontSize:13,color:'#b45309',margin:0}}>
-                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused â answers have been saved'}. Pick up right where you left off.
+                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused Ã¢ÂÂ answers have been saved'}. Pick up right where you left off.
                 </p>
               </div>
             </div>
@@ -235,22 +235,22 @@ function DashboardInner() {
           </>
         )}
 
-        {/* Assessment history â all completed + in-progress draft */}
+        {/* Assessment history Ã¢ÂÂ all completed + in-progress draft */}
         {(assessments.length > 1 || inProgress) && (
           <>
             <h2 style={{fontSize:16,fontWeight:700,color:'#111827',marginBottom:12}}>Assessment History</h2>
             <div style={{background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,overflow:'hidden',marginBottom:28}}>
               <div style={{display:'flex',padding:'10px 20px',background:'#f9fafb',borderBottom:'1px solid #e5e7eb',fontSize:11,fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#6b7280',gap:8}}>
-                <span style={{flex:2}}>Date</span><span style={{flex:4}}>Company</span><span style={{flex:1,textAlign:'center'}}>Score</span><span style={{flex:2}}>Maturity Level</span><span style={{flex:1,textAlign:'irght'}}></span>
+                <span style={{flex:2}}>Date</span><span style={{flex:4}}>Company</span><span style={{flex:1,textAlign:'center'}}>Score</span><span style={{flex:2}}>Maturity Level</span><span style={{flex:1,textAlign:'right'}}></span>
               </div>
 
               {/* In-progress row first if exists */}
               {inProgress && (
                 <div style={{display:'flex',alignItems:'center',padding:'12px 20px',borderBottom:'1px solid #f3f4f6',gap:8,background:'#fffbeb'}}>
                   <span style={{flex:2,color:'#b45309',fontSize:13}}>{formatDate(inProgress.created_at)} <span style={{fontSize:10,fontWeight:600,background:'#fef3c7',color:'#92400e',padding:'1px 6px',borderRadius:4,marginLeft:4}}>IN PROGRESS</span></span>
-                  <span style={{flex:4,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || 'â'}</span>
+                  <span style={{flex:4,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || 'Ã¢ÂÂ'}</span>
                   <span style={{flex:1,textAlign:'center',color:'#9ca3af',fontSize:13}}>
-                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : 'â'}
+                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : 'Ã¢ÂÂ'}
                   </span>
                   <span style={{flex:2,fontSize:12,color:'#b45309'}}>Not completed</span>
                   <span style={{flex:1,textAlign:'right',display:'flex',gap:8,justifyContent:'flex-end'}}>
