@@ -105,6 +105,31 @@ function DashboardInner() {
 
   return (
     <div style={{minHeight:'100vh',background:'#f9fafb',fontFamily:"'Inter',sans-serif"}}>
+      <nav style={{background:'#fff',borderBottom:'1px solid #e5e7eb',padding:'0 24px',height:60,display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
+        <a href="/" style={{display:'flex',alignItems:'center',gap:10,textDecoration:'none'}}>
+          <img src="https://rkfkccefwlarscfjmncz.supabase.co/storage/v1/object/public/assets/Wht%20M%20Solid%20Blue%20Sq%20Clear%20Background.png" alt="Mainspring M" style={{width:36,height:36,borderRadius:8,display:'block'}} />
+          <div><span style={{fontSize:15,fontWeight:700,color:'#0f1f3d',display:'block',lineHeight:1.2}}>Builder Maturity</span><span style={{fontSize:10,color:'#9ca3af',display:'block',lineHeight:1}}>by The Mainspring Group</span></div>
+        </a>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <a href="/account" style={{fontSize:13,fontWeight:500,padding:'7px 16px',borderRadius:7,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',textDecoration:'none'}}>Account</a>
+          <button onClick={handleSignOut} disabled={signingOut} style={{fontSize:13,fontWeight:500,padding:'7px 16px',borderRadius:7,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',cursor:'pointer'}}>{signingOut ? 'Signing out...' : 'Sign out'}</button>
+        </div>
+      </nav>
+
+      <main style={{maxWidth:960,margin:'0 auto',padding:'32px 24px 80px'}}>
+        {showPaymentBanner && (
+          <div style={{background:'#dcfce7',border:'1px solid #86efac',borderRadius:10,padding:'12px 16px',display:'flex',alignItems:'center',gap:10,marginBottom:20,fontSize:14,color:'#15803d',fontWeight:500}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Payment successful! Your subscription is now active.</span>
+            <button onClick={() => setShowPaymentBanner(false)} style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'#15803d',display:'flex',alignItems:'center'}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        )}
+
+        {isExpiringSoon && (
+          <div style={{background:'#fef3c7',border:'1px solid #fcd34d',borderRadius:10,padding:'12px 16px',display:'flex',alignItems:'center',gap:10,marginBottom:20,fontSize:14,color:'#92400e',fontWeight:500}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <span>Your subscription expires on {expiryDate ? formatDate(expiryDate.toISOString()) : ''}. <a href="/account" style={{color:'#92400e',fontWeight:600}}>Renew now</a></span>
           </div>
         )}
@@ -133,7 +158,7 @@ function DashboardInner() {
               <div>
                 <p style={{fontSize:14,fontWeight:700,color:'#92400e',margin:'0 0 2px'}}>Assessment In Progress</p>
                 <p style={{fontSize:13,color:'#b45309',margin:0}}>
-                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused Ã¢ÂÂ answers have been saved'}. Pick up right where you left off.
+                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused — answers have been saved'}. Pick up right where you left off.
                 </p>
               </div>
             </div>
@@ -158,7 +183,7 @@ function DashboardInner() {
             </div>
             <div>
               <div style={{fontSize:14,fontWeight:600,color:'#111827'}}>{!hasSubscription?'No active plan':isAnnual?'Annual Subscription':'Single Assessment'}</div>
-              <div style={{fontSize:12,color:'#6f7280',marginTop:2}}>
+              <div style={{fontSize:12,color:'#6b7280',marginTop:2}}>
                 {!hasSubscription?'Purchase a plan to start your assessment':isAnnual&&expiryDate?`Renews ${formatDate(expiryDate.toISOString())}`:isAnnual?'Active - unlimited assessments':!onetimeUsed?'Assessment available':'Assessment has been used'}
               </div>
             </div>
@@ -199,7 +224,7 @@ function DashboardInner() {
                 <div style={{fontSize:12,color:'#9ca3af',marginBottom:8}}>{latestAssessment.company_name} &middot; {formatDate(latestAssessment.completed_at||latestAssessment.created_at)}</div>
                 <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20}}>
                   {latestAssessment.maturity_level && <span style={{fontSize:11,fontWeight:700,letterSpacing:'0.04em',textTransform:'uppercase',padding:'4px 10px',borderRadius:20,background:getLevelBadgeStyle(latestAssessment.maturity_level_key).bg,color:getLevelBadgeStyle(latestAssessment.maturity_level_key).color}}>{latestAssessment.maturity_level}</span>}
-                  <span style={{fontSize:14,color:'#6f7280'}}>{latestAssessment.overall_score}% overall</span>
+                  <span style={{fontSize:14,color:'#6b7280'}}>{latestAssessment.overall_score}% overall</span>
                   {canModify(latestAssessment) && (
                     <a href={`/assessment?edit=${latestAssessment.id}`} onClick={e=>e.stopPropagation()} style={{fontSize:12,fontWeight:600,color:'#1d4ed8',textDecoration:'none',padding:'3px 10px',border:'1px solid #dbeafe',borderRadius:6,background:'#eff6ff',marginLeft:'auto'}}>Modify Answers</a>
                   )}
@@ -215,16 +240,7 @@ function DashboardInner() {
                   )})}
                 </div>
               </div>
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,minWidth:140}}>
-              <div style={{width:120,height:120,borderRadius:'50%',border:`5px solid ${getScoreColor(latestAssessment.overall_score)}40`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#f9fafb'}}>
-                <span style={{fontSize:36,fontWeight:700,fontFamily:"'DM Serif Display',serif",lineHeight:1,color:getScoreColor(latestAssessment.overall_score)}}>{latestAssessment.overall_score}</span>
-                <span style={{fontSize:10,color:'#9ca3af',marginTop:2}}>out of 100</span>
-              </div>
-              <a href={`/results/${latestAssessment.id}`} style={{fontSize:13,fontWeight:600,color:'#1d4ed8',textDecoration:'none',padding:'8px 16px',border:'1px solid #dbeafe',borderRadius:8,background:'#eff6ff',whiteSpace:'nowrap'}} onClick={e=>e.stopPropagation()}>View Full Report</a>
-            </div>
-          </div>
-        </>
-        )}    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,minWidth:140}}>
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,minWidth:140}}>
                 <div style={{width:120,height:120,borderRadius:'50%',border:`5px solid ${getScoreColor(latestAssessment.overall_score)}40`,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#f9fafb'}}>
                   <span style={{fontSize:36,fontWeight:700,fontFamily:"'DM Serif Display',serif",lineHeight:1,color:getScoreColor(latestAssessment.overall_score)}}>{latestAssessment.overall_score}</span>
                   <span style={{fontSize:10,color:'#9ca3af',marginTop:2}}>out of 100</span>
@@ -235,22 +251,22 @@ function DashboardInner() {
           </>
         )}
 
-        {/* Assessment history Ã¢ÂÂ all completed + in-progress draft */}
+        {/* Assessment history — all completed + in-progress draft */}
         {(assessments.length > 1 || inProgress) && (
           <>
             <h2 style={{fontSize:16,fontWeight:700,color:'#111827',marginBottom:12}}>Assessment History</h2>
             <div style={{background:'#fff',border:'1px solid #e5e7eb',borderRadius:12,overflow:'hidden',marginBottom:28}}>
               <div style={{display:'flex',padding:'10px 20px',background:'#f9fafb',borderBottom:'1px solid #e5e7eb',fontSize:11,fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:'#6b7280',gap:8}}>
-                <span style={{flex:2}}>Date</span><span style={{flex:4}}>Company</span><span style={{flex:1,textAlign:'center'}}>Score</span><span style={{flex:2}}>Maturity Level</span><span style={{flex:1,textAlign:'right'}}></span>
+                <span style={{flex:2}}>Date</span><span style={{flex:2}}>Company</span><span style={{flex:1,textAlign:'center'}}>Score</span><span style={{flex:2}}>Maturity Level</span><span style={{flex:1,textAlign:'right'}}></span>
               </div>
 
               {/* In-progress row first if exists */}
               {inProgress && (
                 <div style={{display:'flex',alignItems:'center',padding:'12px 20px',borderBottom:'1px solid #f3f4f6',gap:8,background:'#fffbeb'}}>
                   <span style={{flex:2,color:'#b45309',fontSize:13}}>{formatDate(inProgress.created_at)} <span style={{fontSize:10,fontWeight:600,background:'#fef3c7',color:'#92400e',padding:'1px 6px',borderRadius:4,marginLeft:4}}>IN PROGRESS</span></span>
-                  <span style={{flex:4,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || 'Ã¢ÂÂ'}</span>
+                  <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || '—'}</span>
                   <span style={{flex:1,textAlign:'center',color:'#9ca3af',fontSize:13}}>
-                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : 'Ã¢ÂÂ'}
+                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : '—'}
                   </span>
                   <span style={{flex:2,fontSize:12,color:'#b45309'}}>Not completed</span>
                   <span style={{flex:1,textAlign:'right',display:'flex',gap:8,justifyContent:'flex-end'}}>
@@ -263,8 +279,8 @@ function DashboardInner() {
               {/* All completed assessments except the latest (already shown above) */}
               {assessments.slice(1).map(a=>(
                 <div key={a.id} style={{display:'flex',alignItems:'center',padding:'12px 20px',borderBottom:'1px solid #f3f4f6',gap:8}}>
-                  <span style={{flex:2,color:'#6f7280',fontSize:13}}>{formatDate(a.completed_at||a.created_at)}</span>
-                  <span style={{flex:4,fontSize:13,fontWeight:500,color:'#111827'}}>{a.company_name}</span>
+                  <span style={{flex:2,color:'#6b7280',fontSize:13}}>{formatDate(a.completed_at||a.created_at)}</span>
+                  <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{a.company_name}</span>
                   <span style={{flex:1,textAlign:'center'}}><span style={{fontSize:12,fontWeight:700,padding:'2px 8px',borderRadius:20,display:'inline-block',color:getScoreColor(a.overall_score),background:getScoreColor(a.overall_score)+'18'}}>{a.overall_score}%</span></span>
                   <span style={{flex:2}}>{a.maturity_level&&<span style={{fontSize:10,fontWeight:700,letterSpacing:'0.04em',textTransform:'uppercase',padding:'3px 8px',borderRadius:20,background:getLevelBadgeStyle(a.maturity_level_key).bg,color:getLevelBadgeStyle(a.maturity_level_key).color}}>{a.maturity_level}</span>}</span>
                   <span style={{flex:1,textAlign:'right',display:'flex',gap:8,justifyContent:'flex-end'}}>
@@ -277,14 +293,16 @@ function DashboardInner() {
               ))}
             </div>
           </>
-        )}        {/* Empty state */}
+        )}
+
+        {/* Empty state */}
         {assessments.length === 0 && hasSubscription && !inProgress && (
           <div style={{background:'#fff',border:'1px solid #e5e7eb',borderRadius:14,padding:'48px 32px',textAlign:'center',marginTop:24}}>
             <div style={{width:60,height:60,background:'#f3f4f6',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
             </div>
             <h3 style={{fontSize:18,fontWeight:700,color:'#111827',marginBottom:8}}>No assessments yet</h3>
-            <p style={{fontSize:14,color:'#6f7280',maxWidth:420,margin:'0 auto 24px',lineHeight:1.6}}>Take your first Operational Maturity Assessment to see where your business stands.</p>
+            <p style={{fontSize:14,color:'#6b7280',maxWidth:420,margin:'0 auto 24px',lineHeight:1.6}}>Take your first Operational Maturity Assessment to see where your business stands.</p>
             <button onClick={()=>router.push('/assessment')} style={{display:'inline-flex',alignItems:'center',background:'#0f1f3d',color:'#fff',border:'none',borderRadius:9,padding:'11px 22px',fontSize:14,fontWeight:600,cursor:'pointer'}}>Start Assessment</button>
           </div>
         )}
