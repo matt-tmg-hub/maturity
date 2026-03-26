@@ -38,8 +38,8 @@ export const LEVEL_SENTIMENTS: Record<string, string> = {
 export const DOMAINS: Domain[] = [
   {
     key: 'org',
-    name: 'Organizational Structure',
-    short: 'Org Structure',
+    name: 'Organization Culture',
+    short: 'Org Culture',
     iconPath: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
     desc: 'How is the business structured, led, and operated day to day?',
     questions: [
@@ -47,11 +47,11 @@ export const DOMAINS: Domain[] = [
         id: '0.1',
         label: 'Executive Leadership Engagement',
         levels: {
-          '-1': `Not engaged unless something goes wrong — then suddenly everyone hears about it. No visibility into day-to-day operations, no interest in process. Team learns to avoid them.`,
-          '0': `Occasionally checks in but mostly hands-off. Engagement is inconsistent — shows up for a few meetings, then disappears. Team isn't sure what decisions need owner input and what doesn't.`,
+          '-1': `Not engaged unless something goes wrong â then suddenly everyone hears about it. No visibility into day-to-day operations, no interest in process. Team learns to avoid them.`,
+          '0': `Occasionally checks in but mostly hands-off. Engagement is inconsistent â shows up for a few meetings, then disappears. Team isn't sure what decisions need owner input and what doesn't.`,
           '1': `Regularly involved in key decisions and process improvement conversations. Aware of what's working and what isn't. Starting to define where they want to lead vs. where they want to delegate.`,
           '2': `Clear, consistent engagement at the right level. Sets direction, removes roadblocks, trusts the team to execute. Not in the weeds, but always accessible when it matters.`,
-          '3': `Engaged at exactly the right altitude — visible enough that the team feels supported, restrained enough that they feel trusted. Defines culture, sets strategy, and then gets out of the way. Team doesn't flounder and doesn't get micromanaged.`,
+          '3': `Engaged at exactly the right altitude â visible enough that the team feels supported, restrained enough that they feel trusted. Defines culture, sets strategy, and then gets out of the way. Team doesn't flounder and doesn't get micromanaged.`,
         },
       },
       {
@@ -62,7 +62,7 @@ export const DOMAINS: Domain[] = [
           '0': `Periodic email updates sent inconsistently. Buyer calls the superintendent when worried. Builder reacts rather than communicates.`,
           '1': `Defined communication touchpoints at key milestones. Buyer knows what to expect and who to call. Builder initiates contact proactively at phase completions.`,
           '2': `Buyer receives consistent milestone updates with photos. Rarely needs to chase the builder. Experience feels organized and professional throughout the build.`,
-          '3': `Buyer feels informed and respected at every stage. Communication is proactive, timely, and matched to what they actually want to know — not a flood of updates, not radio silence.`,
+          '3': `Buyer feels informed and respected at every stage. Communication is proactive, timely, and matched to what they actually want to know â not a flood of updates, not radio silence.`,
         },
       },
       {
@@ -71,7 +71,7 @@ export const DOMAINS: Domain[] = [
         levels: {
           '-1': `Running on spreadsheets, whiteboards, and memory. No system of record. Critical information lives in one person's head or phone.`,
           '0': `A system exists but adoption is partial. Staff work around it as often as in it. Data is inconsistent and hard to trust.`,
-          '1': `Core functions — purchasing, scheduling, accounting — are in a system and generally used. Some manual workarounds remain. Leadership is pushing for better discipline.`,
+          '1': `Core functions â purchasing, scheduling, accounting â are in a system and generally used. Some manual workarounds remain. Leadership is pushing for better discipline.`,
           '2': `Systems are consistently used across the organization. Data is reliable enough to make decisions from. The team is integrating functions that used to run independently.`,
           '3': `Technology serves the business rather than the other way around. Right tools for each function, well-adopted, and connected. Information flows without manual re-entry. Team runs on data, not instinct.`,
         },
@@ -92,7 +92,7 @@ export const DOMAINS: Domain[] = [
         label: 'Value Engineering and Cost Culture',
         levels: {
           '-1': `No formal process. Cost decisions made on gut feel or whoever pushed hardest. No review of what things actually cost vs. what was expected.`,
-          '0': `Cost conversations happen reactively — usually when a job goes sideways. 'Find someone cheaper' is the primary cost strategy. No systematic tracking of where money goes.`,
+          '0': `Cost conversations happen reactively â usually when a job goes sideways. 'Find someone cheaper' is the primary cost strategy. No systematic tracking of where money goes.`,
           '1': `Costs are tracked at the job level. Variances are visible after the fact. Starting to ask 'why did this cost more?' and using the answer to improve future estimates.`,
           '2': `Cost culture is proactive. Trade partners and internal team regularly review materials, methods, and pricing together. Savings ideas are solicited and acted on.`,
           '3': `Value engineering is a discipline, not an event. The team continuously improves cost performance through structured reviews, trade partner collaboration, and a culture where everyone is accountable for margin.`,
@@ -105,7 +105,7 @@ export const DOMAINS: Domain[] = [
           '-1': `Margin is a guess until the job closes. Cost surprises are normal. No one knows if a job is profitable until accounting closes it out months later.`,
           '0': `Job-level estimates exist but aren't tracked in real time. Significant variances are discovered late. Margin management is mostly reactive.`,
           '1': `Unit-price cost system in place. Variances tracked per job. Finance and operations are starting to speak the same language.`,
-          '2': `Cost visibility exists at the job and portfolio level in near real time. Margin managed proactively — variances trigger a conversation before they become a problem.`,
+          '2': `Cost visibility exists at the job and portfolio level in near real time. Margin managed proactively â variances trigger a conversation before they become a problem.`,
           '3': `Leadership has clear, current visibility into margin across every job. Cost surprises are rare and small. The team manages the business with financial clarity, not end-of-year revelations.`,
         },
       },
@@ -117,7 +117,7 @@ export const DOMAINS: Domain[] = [
           '0': `Purchasing team collects quotes and processes invoices. No unit pricing system. Cost control is informal and relationship-dependent.`,
           '1': `Purchase orders issued against a cost catalog. Trade partners know what to expect. Variances require a formal change process. Gross margin actively monitored.`,
           '2': `Purchasing is systematic and disciplined. Unit pricing established and maintained. Purchasing team is focused on value, not just price.`,
-          '3': `Purchasing operates as a strategic function — not just processing paper but actively improving cost performance, managing trade partner relationships, and finding better ways to buy without sacrificing quality.`,
+          '3': `Purchasing operates as a strategic function â not just processing paper but actively improving cost performance, managing trade partner relationships, and finding better ways to buy without sacrificing quality.`,
         },
       },
       {
@@ -128,7 +128,7 @@ export const DOMAINS: Domain[] = [
           '0': `Informal preferred vendor list exists. Relationships are managed by whoever knows the trade partner personally. Performance issues handled case by case with no systemic approach.`,
           '1': `Formal qualification and onboarding process in place. Scopes of work and pricing documented. Performance issues addressed through a defined process rather than avoidance.`,
           '2': `Trade partner relationships are actively managed. Performance tracked and reviewed. Top performers rewarded with volume and preferred status. Underperformers given a path to improve or are replaced.`,
-          '3': `Trade partners operate as true business partners — aligned on expectations, accountable to defined standards, and invested in the builder's success. Relationship built on mutual respect and clear performance metrics, not just familiarity.`,
+          '3': `Trade partners operate as true business partners â aligned on expectations, accountable to defined standards, and invested in the builder's success. Relationship built on mutual respect and clear performance metrics, not just familiarity.`,
         },
       },
       {
@@ -147,7 +147,7 @@ export const DOMAINS: Domain[] = [
   {
     key: 'customer',
     name: 'Customer Experience',
-    short: 'Customer',
+    short: 'Customer Experience',
     iconPath: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
     desc: 'How does the builder attract, serve, and retain home buyers throughout the process?',
     questions: [
@@ -155,8 +155,8 @@ export const DOMAINS: Domain[] = [
         id: '1.1',
         label: 'Customer Discovery',
         levels: {
-          '-1': `Buyers show up by accident — open houses, yard signs, word of mouth. No organized lead generation. No one knows where customers came from.`,
-          '0': `Some intentional marketing — home shows, walk-ins, a basic website. Leads tracked in a spreadsheet if at all. Follow-up is inconsistent.`,
+          '-1': `Buyers show up by accident â open houses, yard signs, word of mouth. No organized lead generation. No one knows where customers came from.`,
+          '0': `Some intentional marketing â home shows, walk-ins, a basic website. Leads tracked in a spreadsheet if at all. Follow-up is inconsistent.`,
           '1': `Organized marketing approach with a defined lead generation process. Leads captured in a system and followed up consistently. Builder knows where their customers are coming from.`,
           '2': `Marketing is intentional and measurable. Leads are qualified before they reach sales. Builder understands which channels produce buyers, not just inquiries.`,
           '3': `The right buyers find the builder at the right time. Marketing is targeted, cost-efficient, and continuously refined based on what actually converts to closed homes.`,
@@ -268,16 +268,16 @@ export const DOMAINS: Domain[] = [
           '-1': `Model home is the only selling tool. No digital component. Buyer has to be physically present to understand what they're buying.`,
           '0': `Model home with some printed materials and a basic website. Digital presence is minimal and not integrated with the sales process.`,
           '1': `Model home supplemented by quality renderings, virtual tours, and online plan information. Buyer can do meaningful research before visiting.`,
-          '2': `Sales environment — physical and digital — works together. Buyer can explore, compare, and get pricing without needing a salesperson's help for every question.`,
-          '3': `The sales experience — whether in person or online — makes the builder's homes easy to understand and easy to fall in love with. It earns confidence before the buyer ever meets a salesperson.`,
+          '2': `Sales environment â physical and digital â works together. Buyer can explore, compare, and get pricing without needing a salesperson's help for every question.`,
+          '3': `The sales experience â whether in person or online â makes the builder's homes easy to understand and easy to fall in love with. It earns confidence before the buyer ever meets a salesperson.`,
         },
       },
     ],
   },
   {
     key: 'trade',
-    name: 'Trade Partner / Supplier',
-    short: 'Trade Partner',
+    name: 'Trade Partners',
+    short: 'Trade Partners',
     iconPath: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0',
     desc: 'How does the builder find, manage, and retain trade partners and suppliers?',
     questions: [
@@ -308,10 +308,10 @@ export const DOMAINS: Domain[] = [
         label: 'Trade Partner Onboarding',
         levels: {
           '-1': `New trade partner handed a set of plans and pointed to a job site. No formal orientation.`,
-          '0': `Basic information shared — plans, pay schedule, insurance requirements. Setup in accounting. No structured introduction to how the builder operates.`,
+          '0': `Basic information shared â plans, pay schedule, insurance requirements. Setup in accounting. No structured introduction to how the builder operates.`,
           '1': `Structured onboarding process. Scope of work documented, pricing established, scheduling expectations communicated, on-site rules explained.`,
           '2': `Trade partners understand exactly what is expected of them before they set foot on a job site. Onboarding is consistent regardless of who handles it.`,
-          '3': `Onboarding sets trade partners up to succeed. They arrive knowing the builder's standards, processes, and expectations — and they're held to them from day one.`,
+          '3': `Onboarding sets trade partners up to succeed. They arrive knowing the builder's standards, processes, and expectations â and they're held to them from day one.`,
         },
       },
       {
@@ -355,7 +355,7 @@ export const DOMAINS: Domain[] = [
           '0': `Problem trade partners are quietly dropped. No formal feedback, no corrective process, no documentation.`,
           '1': `Performance tracked on quality, schedule, and cost. Underperformance addressed in a documented conversation. Clear expectations set going forward.`,
           '2': `Performance reviewed regularly. Top performers recognized and given more work. Underperformers go through a formal corrective process before being removed.`,
-          '3': `Trade partners know exactly how they're performing and what is expected. The system rewards excellence and addresses problems early — before they end up in a home that a buyer will live in for 30 years.`,
+          '3': `Trade partners know exactly how they're performing and what is expected. The system rewards excellence and addresses problems early â before they end up in a home that a buyer will live in for 30 years.`,
         },
       },
       {
@@ -418,9 +418,9 @@ export const DOMAINS: Domain[] = [
   {
     key: 'internal',
     name: 'Internal Operations',
-    short: 'Internal Ops',
+    short: 'Internal Operations',
     iconPath: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
-    desc: 'How do internal teams — design, sales, accounting, and purchasing — perform and collaborate?',
+    desc: 'How do internal teams â design, sales, accounting, and purchasing â perform and collaborate?',
     questions: [
       {
         id: '3.1',
@@ -437,7 +437,7 @@ export const DOMAINS: Domain[] = [
         id: '3.2',
         label: 'Sales Team Structure and Effectiveness',
         levels: {
-          '-1': `Sales handled by whoever is available — owner, superintendent, a part-time agent. No defined sales process or accountability.`,
+          '-1': `Sales handled by whoever is available â owner, superintendent, a part-time agent. No defined sales process or accountability.`,
           '0': `Dedicated sales staff in model homes. Results are relationship-dependent. No consistent process, no performance management.`,
           '1': `Sales team follows a defined process. Performance tracked. Customer handoff from sales to production is documented and reliable.`,
           '2': `Sales team is professional, accountable, and well-integrated with the rest of the operation. They know what they can promise and what they can't.`,
@@ -460,7 +460,7 @@ export const DOMAINS: Domain[] = [
         label: 'Purchasing Team Structure and Effectiveness',
         levels: {
           '-1': `Purchasing is whoever makes the calls. No defined process, no accountability, no cost system.`,
-          '0': `Purchasing team exists but operates reactively — collecting bids, processing invoices, putting out fires. No unit pricing, no systematic cost management.`,
+          '0': `Purchasing team exists but operates reactively â collecting bids, processing invoices, putting out fires. No unit pricing, no systematic cost management.`,
           '1': `Purchasing manages a cost catalog, issues purchase orders, and monitors gross margin. Trade partners know the process and follow it.`,
           '2': `Purchasing is proactive. Cost performance actively managed. Trade partner pricing reviewed and updated regularly. Team focused on value, not just price.`,
           '3': `Purchasing is a profit center, not just a processing function. The team continuously improves cost performance, strengthens trade partner relationships, and protects margin at every job.`,
@@ -470,8 +470,8 @@ export const DOMAINS: Domain[] = [
   },
   {
     key: 'builder_rep',
-    name: 'Builder Rep Experience',
-    short: 'Builder Rep',
+    name: 'Field Management',
+    short: 'Field Management',
     iconPath: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
     desc: 'How does the field superintendent manage the construction process and the buyer experience on site?',
     questions: [
@@ -479,7 +479,7 @@ export const DOMAINS: Domain[] = [
         id: '4.1',
         label: 'Involvement in the Sales Process',
         levels: {
-          '-1': `Sales makes promises. Field finds out at the pre-construction meeting — or on the job site.`,
+          '-1': `Sales makes promises. Field finds out at the pre-construction meeting â or on the job site.`,
           '0': `Superintendent occasionally consulted on whether a customization is feasible. No formal involvement.`,
           '1': `Customization requests and commitments routed through a defined process that includes field review before promises are made to the buyer.`,
           '2': `Field team has clear visibility into what was sold and committed. Handoff from sales to production is documented and reliable. No surprises.`,
@@ -512,7 +512,7 @@ export const DOMAINS: Domain[] = [
         id: '4.4',
         label: 'During Construction Management',
         levels: {
-          '-1': `Superintendent manages reactively — responding to problems as they arise. Jobs run on tribal knowledge and constant presence.`,
+          '-1': `Superintendent manages reactively â responding to problems as they arise. Jobs run on tribal knowledge and constant presence.`,
           '0': `Superintendent visits every job site daily. Manages by walking around and making calls. System plays little role in day-to-day management.`,
           '1': `Superintendent manages by exception. System handles routine scheduling and communication. Field time focused on quality and problem resolution.`,
           '2': `Superintendent is a manager, not a babysitter. Trade partners execute reliably. Issues are caught early and resolved through a defined process.`,
@@ -527,7 +527,7 @@ export const DOMAINS: Domain[] = [
           '0': `Closing walkthrough completed. Punchlist items noted. Homeowner gets a folder of manuals.`,
           '1': `Structured home orientation completed before closing. Punchlist items tracked and resolved. Homeowner knows who to call for warranty.`,
           '2': `Zero-defect standard pursued before closing. Orientation is thorough and consistent. Homeowner leaves feeling confident about their new home and about the builder.`,
-          '3': `Closing is one of the best moments in the buyer's experience. The home is ready, the orientation is thorough, and the buyer feels taken care of — not relieved that it's finally over.`,
+          '3': `Closing is one of the best moments in the buyer's experience. The home is ready, the orientation is thorough, and the buyer feels taken care of â not relieved that it's finally over.`,
         },
       },
       {
@@ -560,15 +560,15 @@ export const DOMAINS: Domain[] = [
           '0': `Basic safety expectations communicated to trade partners. Occasional site walk. Compliance is assumed rather than verified.`,
           '1': `Formal safety program in place. Requirements documented and communicated. Site audits conducted on a defined schedule.`,
           '2': `Safety performance tracked by trade partner. Near-misses reported and reviewed. Corrective action documented and followed up.`,
-          '3': `Safety is a value, not a compliance exercise. Trade partners are held to a clear standard. The job sites are safe because the culture demands it — not because someone occasionally walks through with a checklist.`,
+          '3': `Safety is a value, not a compliance exercise. Trade partners are held to a clear standard. The job sites are safe because the culture demands it â not because someone occasionally walks through with a checklist.`,
         },
       },
     ],
   },
   {
     key: 'systems',
-    name: 'Supporting Systems',
-    short: 'Systems',
+    name: 'Platform/Systems',
+    short: 'Platform/Systems',
     iconPath: 'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18',
     desc: 'What systems and technology support the builder across sales, operations, field management, and reporting?',
     questions: [
@@ -578,9 +578,9 @@ export const DOMAINS: Domain[] = [
         levels: {
           '-1': `Paper-based or no system. Buyer gets a printed contract and a handshake. No digital component to the buying experience.`,
           '0': `Basic website exists. Some information available online but buying process still requires in-person visits and manual paperwork.`,
-          '1': `Core buying process supported by technology — leads captured in a system, contracts executed digitally, buyer communication tracked.`,
-          '2': `Buyer experience is well-supported by technology at each stage — from inquiry to contract to construction updates. Systems work together rather than in silos.`,
-          '3': `Technology makes buying a home from this builder easier than the competition. The buyer never feels like they're fighting the process — the process works for them.`,
+          '1': `Core buying process supported by technology â leads captured in a system, contracts executed digitally, buyer communication tracked.`,
+          '2': `Buyer experience is well-supported by technology at each stage â from inquiry to contract to construction updates. Systems work together rather than in silos.`,
+          '3': `Technology makes buying a home from this builder easier than the competition. The buyer never feels like they're fighting the process â the process works for them.`,
         },
       },
       {
@@ -602,7 +602,7 @@ export const DOMAINS: Domain[] = [
           '0': `Selections process is manual but organized. Buyer meets with a selections coordinator. Results emailed to purchasing with room for error.`,
           '1': `Structured selections system in place. Buyer choices documented and communicated to purchasing reliably. Cost of selections tracked.`,
           '2': `Selections process is smooth and connected. Buyer choices flow directly into purchasing and construction systems without manual re-entry.`,
-          '3': `Selections are a highlight of the buying experience. The process is clear, the choices well-curated, and what the buyer picks is exactly what gets installed — every time.`,
+          '3': `Selections are a highlight of the buying experience. The process is clear, the choices well-curated, and what the buyer picks is exactly what gets installed â every time.`,
         },
       },
       {
@@ -613,7 +613,7 @@ export const DOMAINS: Domain[] = [
           '0': `Accounting software used for basic functions. Invoices entered manually. Financial reports produced periodically but not integrated with operations.`,
           '1': `Accounting system handles payables, payroll, draws, and job costs. Integrated with purchasing at a basic level. Reports available on demand.`,
           '2': `Accounting is fully integrated with operations. Job-level cost data current and accurate. Financial reporting supports real-time management decisions.`,
-          '3': `Accounting is a trusted source of truth for the business. Costs are accurate, reports are current, and the financial system supports — rather than lags behind — how the business actually operates.`,
+          '3': `Accounting is a trusted source of truth for the business. Costs are accurate, reports are current, and the financial system supports â rather than lags behind â how the business actually operates.`,
         },
       },
       {
@@ -646,7 +646,7 @@ export const DOMAINS: Domain[] = [
           '0': `Builder website and email used for communication. No central log of what was communicated or when.`,
           '1': `Customer portal or defined communication process in place. Buyer can check status and submit questions through a defined channel.`,
           '2': `Real-time buyer communication supported by a system. Milestone updates, photo sharing, and issue resolution all handled through one platform.`,
-          '3': `Buyers are never left wondering. The communication system keeps them informed at every stage and gives them confidence that the builder is running a professional operation — because they are.`,
+          '3': `Buyers are never left wondering. The communication system keeps them informed at every stage and gives them confidence that the builder is running a professional operation â because they are.`,
         },
       },
       {
@@ -655,9 +655,9 @@ export const DOMAINS: Domain[] = [
         levels: {
           '-1': `No formal reporting. Owner knows the business anecdotally. Decisions made on gut feel and end-of-year financials.`,
           '0': `Basic financial reports available from the accounting system. Key metrics tracked manually if at all.`,
-          '1': `Regular operational reporting in place. Key metrics — closings, margins, cycle times, customer satisfaction — tracked and reviewed.`,
+          '1': `Regular operational reporting in place. Key metrics â closings, margins, cycle times, customer satisfaction â tracked and reviewed.`,
           '2': `Leadership has access to current, reliable data across the business. Variances identified and acted on before they become problems.`,
-          '3': `The business is managed with data. Leadership knows where the business stands, where it's headed, and what needs attention — not because they dug through spreadsheets, but because the systems make it visible.`,
+          '3': `The business is managed with data. Leadership knows where the business stands, where it's headed, and what needs attention â not because they dug through spreadsheets, but because the systems make it visible.`,
         },
       },
       {
