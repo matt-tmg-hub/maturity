@@ -62,7 +62,7 @@ function DashboardInner() {
 
   async function handleSignOut() { setSigningOut(true); const supabase = createClient(); await supabase.auth.signOut(); router.push('/') }
   function handleStartAssessment() { router.push(subscription ? '/assessment' : '/pricing') }
-  function handleContinueAssessment() { router.push('/assessment') }
+  function handleContinueAssessment() { router.push('/assessment?resume=true') }
 
   if (loading) return <LoadingScreen />
 
@@ -135,7 +135,7 @@ function DashboardInner() {
               <div>
                 <p style={{fontSize:14,fontWeight:700,color:'#92400e',margin:'0 0 2px'}}>Assessment In Progress</p>
                 <p style={{fontSize:13,color:'#b45309',margin:0}}>
-                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused — answers have been saved'}. Pick up right where you left off.
+                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused â answers have been saved'}. Pick up right where you left off.
                 </p>
               </div>
             </div>
