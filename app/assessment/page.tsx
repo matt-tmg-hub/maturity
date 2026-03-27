@@ -46,9 +46,7 @@ export default async function AssessmentPage({
 
   if (edit) {
     // Annual subscribers can always edit; onetime subscribers get 7 days from completion
-    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
-    const canEdit = sub.plan_type === 'annual' ||
-      (sub.plan_type === 'onetime' && sub.created_at && (Date.now() - new Date(sub.created_at).getTime()) < SEVEN_DAYS)
+    const canEdit = sub.plan_type === 'annual' || sub.plan_type === 'onetime'
     if (canEdit) {
       const { data: assessment } = await supabase
         .from('assessments')
