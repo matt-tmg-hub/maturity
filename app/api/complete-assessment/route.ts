@@ -145,6 +145,17 @@ ${domainSectionInstructions}
 
 <h4>Protect Your Strength: ${highest?.domainName}</h4>
 [1-2 sentences. Acknowledge what they're doing well and briefly note how this strength can support improvement in the weaker areas.]
+${(() => {
+  const watchDomains = sorted.filter(d =>
+    d.pct < overall - 10 &&
+    !focusDomains.find((f: any) => f.domainName === d.domainName) &&
+    d.domainName !== highest?.domainName
+  )
+  if (watchDomains.length === 0) return ''
+  return watchDomains.map((d: any) => `
+<h4>Also Watch: ${d.domainName} (${d.pct}%)</h4>
+[1 paragraph only — 3 to 4 sentences max. Call out the 1-2 specific sub-areas dragging this domain down based on the gap analysis. Give one concrete near-term action. This is a heads-up, not a full action plan. Do not pad.]`).join('\n')
+})()}
 
 Tone: Direct, practical, written for a homebuilder CEO. No filler. Reference maturity level names (Anchor, Typical, Strategic Implementer, Adaptive Innovator, Guiding Star) where relevant.
 Format with <h4> headers and <p> tags. Use <br/> between numbered action items.`
