@@ -280,7 +280,7 @@ export default function AssessmentClient({
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '16px 20px', marginBottom: 24 }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#1d4ed8', margin: '0 0 4px' }}>Resume your in-progress assessment?</p>
               <p style={{ fontSize: 13, color: '#374151', margin: '0 0 12px' }}>
-                You have a saved assessment with {Object.keys(draftData.answers).length} of {TOTAL} questions answered. It will remain available until you complete it.
+                You have a saved assessment with {Object.keys(draftData.answers).length} of {TOTAL} items answered. It will remain available until you complete it.
               </p>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={resumeDraft} style={{ background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 7, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Continue Assessment</button>
@@ -293,7 +293,7 @@ export default function AssessmentClient({
               {editAssessmentId ? 'Edit Your Assessment' : 'Start Your Assessment'}
             </h1>
             <p style={{ fontSize: 14, color: '#6b7280', margin: 0, lineHeight: 1.6 }}>
-              53 questions across 6 operational domains. Takes about 20-30 minutes. Tell us a bit about your company first.
+              53 items across 6 operational domains. Takes about 20-30 minutes. Tell us a bit about your company first.
             </p>
           </div>
           <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '32px 28px' }}>
@@ -457,7 +457,7 @@ export default function AssessmentClient({
                 {unansweredIndices.length} unanswered &#8212; Jump to first
               </button>
             ) : (
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#16a34a' }}>&#10003; All questions answered</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#16a34a' }}>&#10003; All items answered</span>
             )}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -477,7 +477,7 @@ export default function AssessmentClient({
               )
             })}
           </div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '10px 0 0' }}>Click any square to jump to that question</p>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '10px 0 0' }}>Click any square to jump to that item</p>
         </div>
 
 
@@ -495,27 +495,25 @@ export default function AssessmentClient({
           </div>
         </div>
 
-        {/* Question card */}
+        {/* Assessment item card */}
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '28px 28px 24px', marginBottom: 16 }}>
-          <div key={qCounterKey} className="q-counter" style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10, fontWeight: 600 }}>
-            Question {currentQ + 1} of {TOTAL}
+          <div key={qCounterKey} className="q-counter" style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12, fontWeight: 600 }}>
+            {currentQ + 1} of {TOTAL}
           </div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f1f3d', margin: '0 0 20px', lineHeight: 1.4 }}>{currentQuestion?.label}</h2>
-          <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 14px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Select the level that best describes your current operation:</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {['-1', '0', '1', '2', '3'].map(level => {
+          <p style={{ fontSize: 14, color: '#6b7280', margin: '0 0 4px', lineHeight: 1.4 }}>Which of the following best describes your</p>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f1f3d', margin: '0 0 20px', lineHeight: 1.3 }}>{currentQuestion?.label}</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {['-1', '0', '1', '2', '3'].map((level, idx) => {
               const isSelected = answers[currentQuestion?.id] === level
+              // Subtle light-to-dark progression across the five options (no level names or numbers shown)
+              const restingTint = `rgba(15,31,61,${(idx * 0.025).toFixed(3)})`
               return (
                 <button key={level} onClick={() => selectAnswer(currentQuestion.id, level)}
-                  aria-label={`Select Level ${level}: ${LEVEL_LABELS[level]} for ${currentQuestion?.label}`}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '14px 16px', border: `2px solid ${isSelected ? LEVEL_COLORS[level] : '#e5e7eb'}`, borderRadius: 10, background: isSelected ? `${LEVEL_COLORS[level]}0d` : '#fafafa', cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', width: '100%', minHeight: 44 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, background: isSelected ? LEVEL_COLORS[level] : '#f3f4f6', color: isSelected ? '#fff' : '#6b7280', border: `2px solid ${isSelected ? LEVEL_COLORS[level] : '#e5e7eb'}` }}>
-                    {level === '-1' ? '-1' : level}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: isSelected ? LEVEL_COLORS[level] : '#374151', marginBottom: 3 }}>Level {level}: {LEVEL_LABELS[level]}</div>
-                    <div style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{currentQuestion?.levels[level]}</div>
-                  </div>
+                  aria-label={`Select option ${idx + 1} of 5 for ${currentQuestion?.label}`}
+                  aria-pressed={isSelected}
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '16px 18px', border: `1.5px solid ${isSelected ? '#0f1f3d' : '#e2e5ea'}`, borderRadius: 12, background: isSelected ? '#0f1f3d' : restingTint, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', width: '100%', minHeight: 44 }}>
+                  <div style={{ width: 18, height: 18, marginTop: 2, borderRadius: '50%', flexShrink: 0, border: `2px solid ${isSelected ? '#fff' : '#b8c0cc'}`, background: '#fff', boxShadow: isSelected ? 'inset 0 0 0 4px #0f1f3d' : 'none' }} />
+                  <div style={{ flex: 1, fontSize: 14, color: isSelected ? '#fff' : '#374151', lineHeight: 1.5 }}>{currentQuestion?.levels[level]}</div>
                 </button>
               )
             })}
@@ -595,7 +593,7 @@ export default function AssessmentClient({
             </div>
             <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, fontWeight: 400, color: '#0f1f3d', marginBottom: 12 }}>Assessment Complete!</h2>
             <p style={{ fontSize: 15, color: '#6b7280', lineHeight: 1.6, marginBottom: 32 }}>
-              You've answered all {ALL_QUESTIONS.length} questions. You can review and edit any previous answer, or click <strong>View Results</strong> to generate your report.
+              You've answered all {ALL_QUESTIONS.length} items. You can review and edit any previous answer, or click <strong>View Results</strong> to generate your report.
             </p>
             <div style={{ display: 'flex', gap: 12, flexDirection: 'column' }}>
               <button onClick={() => { setShowCompletion(false); handleSubmit(); }}
