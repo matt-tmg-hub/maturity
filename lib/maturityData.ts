@@ -153,7 +153,7 @@ export const DOMAINS: Domain[] = [
     questions: [
       {
         id: '1.1',
-        label: 'Customer Discovery',
+        label: 'Customer Discovery Process',
         levels: {
           '-1': `Buyers show up by accident — open houses, yard signs, word of mouth. No organized lead generation. No one knows where customers came from.`,
           '0': `Some intentional marketing — home shows, walk-ins, a basic website. Leads tracked in a spreadsheet if at all. Follow-up is inconsistent.`,
@@ -393,7 +393,7 @@ export const DOMAINS: Domain[] = [
       },
       {
         id: '2.11',
-        label: 'Warranty Work by Trade Partners',
+        label: 'Trade Partner Warranty Work',
         levels: {
           '-1': `Builder calls the trade partner when a homeowner complains. Response is inconsistent. Some trade partners respond, some don't.`,
           '0': `Warranty work assigned informally. Completion tracked inconsistently. Homeowner often has to follow up multiple times.`,
@@ -477,7 +477,7 @@ export const DOMAINS: Domain[] = [
     questions: [
       {
         id: '4.1',
-        label: 'Involvement in the Sales Process',
+        label: 'Field Team Involvement in the Sales Process',
         levels: {
           '-1': `Sales makes promises. Field finds out at the pre-construction meeting — or on the job site.`,
           '0': `Superintendent occasionally consulted on whether a customization is feasible. No formal involvement.`,
@@ -510,7 +510,7 @@ export const DOMAINS: Domain[] = [
       },
       {
         id: '4.4',
-        label: 'During Construction Management',
+        label: 'Job Management During Construction',
         levels: {
           '-1': `Superintendent manages reactively — responding to problems as they arise. Jobs run on tribal knowledge and constant presence.`,
           '0': `Superintendent visits every job site daily. Manages by walking around and making calls. System plays little role in day-to-day management.`,

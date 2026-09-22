@@ -33,7 +33,7 @@ export function identifyPriorityDomains(domainScores: DomainScores) {
     ? sorted.slice(0, 3)
     : sorted.filter(d => d.pct < 37.5 || d.pct < avg - 15).slice(0, 2)
 
-  // Two focus domains within 10 points — parallel priorities (different teams, same timeframe)
+  // Two focus domains within 10 points - parallel priorities (different teams, same timeframe)
   const twoDomainsClose = priorityDomains.length >= 2 &&
     (priorityDomains[1].pct - priorityDomains[0].pct) <= 10
 
@@ -42,10 +42,10 @@ export function identifyPriorityDomains(domainScores: DomainScores) {
 
 function describeVolume(volume: string): string {
   const n = parseInt(volume.replace(/[^0-9]/g, ''), 10)
-  if (isNaN(n)) return 'Volume not stated — assume a small builder and keep recommendations lean.'
-  if (n <= 10) return 'Small builder (roughly 1–10 homes/year). The owner is likely doing several jobs personally. Recommend low-cost, low-overhead moves: simple templates, one accountable person, no enterprise software purchases. Every action must be doable by a team of a handful of people.'
-  if (n <= 50) return 'Mid-size builder (roughly 11–50 homes/year). Enough volume to justify defined roles, a purchasing function, and a real system of record, but still lean. Recommend process discipline and adoption of tools they likely already own before buying new ones.'
-  if (n <= 200) return 'Growing production builder (roughly 51–200 homes/year). Scale is creating pain wherever process is person-dependent. Recommend system-driven workflows, unit-price purchasing, trade partner scorecards, and clear owner/manager separation.'
+  if (isNaN(n)) return 'Volume not stated \u2014 assume a small builder and keep recommendations lean.'
+  if (n <= 10) return 'Small builder (roughly 1\u201310 homes/year). The owner is likely doing several jobs personally. Recommend low-cost, low-overhead moves: simple templates, one accountable person, no enterprise software purchases. Every action must be doable by a team of a handful of people.'
+  if (n <= 50) return 'Mid-size builder (roughly 11\u201350 homes/year). Enough volume to justify defined roles, a purchasing function, and a real system of record, but still lean. Recommend process discipline and adoption of tools they likely already own before buying new ones.'
+  if (n <= 200) return 'Growing production builder (roughly 51\u2013200 homes/year). Scale is creating pain wherever process is person-dependent. Recommend system-driven workflows, unit-price purchasing, trade partner scorecards, and clear owner/manager separation.'
   return 'Large production builder (200+ homes/year). Recommendations should assume dedicated department heads, an ERP, and the ability to fund integration and reporting work. Focus on consistency across divisions and management by exception.'
 }
 
@@ -66,11 +66,11 @@ export function buildRecommendationsPrompt(
   DOMAINS.forEach(domain => {
     const ds = domainScores[domain.key]
     if (!ds || ds.answered === 0) return
-    fullRecord += `\n\n## ${domain.name} — ${ds.pct}% (${getLevelFromScore(ds.pct).name})${isFocus(ds) ? '  [FOCUS DOMAIN]' : ''}`
+    fullRecord += `\n\n## ${domain.name} \u2014 ${ds.pct}% (${getLevelFromScore(ds.pct).name})${isFocus(ds) ? '  [FOCUS DOMAIN]' : ''}`
     domain.questions.forEach(q => {
       const ans = answers[q.id]
       if (ans === null || ans === undefined || ans === 'na') return
-      fullRecord += `\n- ${q.label} → Level ${ans} (${LEVEL_NAMES[ans]}): "${q.levels[ans]}"`
+      fullRecord += `\n- ${q.label} -> Level ${ans} (${LEVEL_NAMES[ans]}): "${q.levels[ans]}"`
     })
   })
 
@@ -81,8 +81,8 @@ export function buildRecommendationsPrompt(
     if (!ds || ds.answered === 0 || !isFocus(ds)) return
 
     const isPrimary = focusDomains[0].domainKey === ds.domainKey
-    gapAnalysis += `\n\n### ${domain.name} — ${ds.pct}% (${getLevelFromScore(ds.pct).name})`
-    gapAnalysis += twoDomainsClose ? ' ← PARALLEL PRIORITY' : isPrimary ? ' ← PRIMARY FOCUS' : ' ← SECONDARY (address after primary is moving)'
+    gapAnalysis += `\n\n### ${domain.name} \u2014 ${ds.pct}% (${getLevelFromScore(ds.pct).name})`
+    gapAnalysis += twoDomainsClose ? ' <- PARALLEL PRIORITY' : isPrimary ? ' <- PRIMARY FOCUS' : ' <- SECONDARY (address after primary is moving)'
 
     const scoreMap: Record<string, number> = { '-1': 0, '0': 1, '1': 2, '2': 3, '3': 4 }
     const items = domain.questions
@@ -93,7 +93,7 @@ export function buildRecommendationsPrompt(
     items.forEach(({ q, ans }) => {
       const next = getNextLevel(ans)
       if (!next) return
-      gapAnalysis += `\n\n**${q.label}** (Level ${ans} ${LEVEL_NAMES[ans]} → Level ${next} ${LEVEL_NAMES[next]})`
+      gapAnalysis += `\n\n**${q.label}** (Level ${ans} ${LEVEL_NAMES[ans]} -> Level ${next} ${LEVEL_NAMES[next]})`
       gapAnalysis += `\nNow: ${q.levels[ans]}`
       gapAnalysis += `\nNext: ${q.levels[next]}`
     })
@@ -104,27 +104,27 @@ export function buildRecommendationsPrompt(
     .join('\n')
 
   const focusContext = isClustered
-    ? `All domains are within a narrow range (avg ${avg}%). No single domain is dramatically worse — focus on raising the floor across all areas.`
+    ? `All domains are within a narrow range (avg ${avg}%). No single domain is dramatically worse \u2014 focus on raising the floor across all areas.`
     : twoDomainsClose
     ? `Two domains are essentially tied at the bottom and should be treated as PARALLEL priorities: ${focusDomains.map(d => `${d.domainName} at ${d.pct}%`).join(' and ')}. These likely involve different teams so both can be worked simultaneously in the next 90 days.`
-    : `One domain is clearly the primary focus: ${focusDomains[0]?.domainName} at ${focusDomains[0]?.pct}%. ${focusDomains.length > 1 ? `${focusDomains[1]?.domainName} at ${focusDomains[1]?.pct}% should be addressed after the primary is moving (days 90–180).` : ''}`
+    : `One domain is clearly the primary focus: ${focusDomains[0]?.domainName} at ${focusDomains[0]?.pct}%. ${focusDomains.length > 1 ? `${focusDomains[1]?.domainName} at ${focusDomains[1]?.pct}% should be addressed after the primary is moving (days 90\u2013180).` : ''}`
 
   const domainSectionInstructions = focusDomains.map((fd, i) => {
     const timing = twoDomainsClose
       ? 'Next 90 Days'
       : i === 0
       ? 'First 90 Days'
-      : `Days 90–180 (after ${focusDomains[0].domainName} is moving)`
+      : `Days 90\u2013180 (after ${focusDomains[0].domainName} is moving)`
 
     return `
 <h4>${twoDomainsClose ? 'Priority' : i === 0 ? 'Your #1 Priority' : 'Also Needs Attention'}: ${fd.domainName}</h4>
-[One focused paragraph, 4–6 sentences. Name the 2–3 specific items where they scored lowest and say plainly what is happening today in their business because of it (missed closings, margin leakage, owner as bottleneck, trades that don't show, buyers who call the super — whatever the answers actually imply). Then describe what the next level looks like in practice. Connect it to money, time, or risk. Write like an advisor who has walked their jobsites, not a report generator.]
+[One focused paragraph, 4\u20136 sentences. Name the 2\u20133 specific items where they scored lowest and say plainly what is happening today in their business because of it (missed closings, margin leakage, owner as bottleneck, trades that don't show, buyers who call the super \u2014 whatever the answers actually imply). Then describe what the next level looks like in practice. Connect it to money, time, or risk. Write like an advisor who has walked their jobsites, not a report generator.]
 
-<h4>${fd.domainName} — Action Plan (${timing})</h4>
-[4–5 numbered actions, most impactful first. Each action is one to two sentences and MUST include: the specific practice or artifact to put in place (e.g. a written trade partner onboarding packet, a unit-price catalog for the top 10 cost codes, a two-week look-ahead schedule sent every Friday), the role that owns it, and a concrete first step they can take this week. Actions must be sized to this builder's volume. Do not write "document your process" or "assign an owner" as an action on its own — say what to document and what the owner does with it. Format as a numbered list with <br/> between items.]
+<h4>${fd.domainName} \u2014 Action Plan (${timing})</h4>
+[4\u20135 numbered actions, most impactful first. Each action is one to two sentences and MUST include: the specific practice or artifact to put in place (e.g. a written trade partner onboarding packet, a unit-price catalog for the top 10 cost codes, a two-week look-ahead schedule sent every Friday), the role that owns it, and a concrete first step they can take this week. Actions must be sized to this builder's volume. Do not write "document your process" or "assign an owner" as an action on its own \u2014 say what to document and what the owner does with it. Format as a numbered list with <br/> between items.]
 
 <h4>You'll Know You're There When... (${fd.domainName})</h4>
-[3–4 observable milestones, each starting with "You'll know you're there when...". Each must be something the CEO could verify by walking into the office or onto a jobsite — a report that exists, a call that no longer happens, a meeting that runs without them. Derive from the "Next" descriptions but make them concrete and specific to this company's answers. No generic statements about "operating proactively."]`
+[3\u20134 observable milestones, each starting with "You'll know you're there when...". Each must be something the CEO could verify by walking into the office or onto a jobsite \u2014 a report that exists, a call that no longer happens, a meeting that runs without them. Derive from the "Next" descriptions but make them concrete and specific to this company's answers. No generic statements about "operating proactively."]`
   }).join('\n')
 
   const watchDomains = sorted.filter(d =>
@@ -133,14 +133,14 @@ export function buildRecommendationsPrompt(
 
   const watchInstructions = watchDomains.map(d => `
 <h4>Also Watch: ${d.domainName} (${d.pct}%)</h4>
-[One paragraph, 3–4 sentences. Name the 1–2 specific items dragging this domain down and give one concrete near-term action with an owner. This is a heads-up, not a full plan.]`).join('\n')
+[One paragraph, 3\u20134 sentences. Name the 1\u20132 specific items dragging this domain down and give one concrete near-term action with an owner. This is a heads-up, not a full plan.]`).join('\n')
 
   return `You are a senior operations advisor to residential homebuilders, writing the recommendations section of a maturity assessment report for a CEO who paid for this and will judge the whole product by how specific and useful it is. Generic advice is a failure. Every sentence must be traceable to something in their actual answers below.
 
 COMPANY
-- ${companyInfo.company} — ${companyInfo.volume || 'volume not stated'} homes/year, ${companyInfo.state || 'location not stated'}
+- ${companyInfo.company} \u2014 ${companyInfo.volume || 'volume not stated'} homes/year, ${companyInfo.state || 'location not stated'}
 - Respondent: ${companyInfo.name}, ${companyInfo.title}
-- Overall: ${overall}% — ${level.name} ("${level.sentiment}")
+- Overall: ${overall}% \u2014 ${level.name} ("${level.sentiment}")
 - Sizing guidance: ${describeVolume(companyInfo.volume)}
 
 DOMAIN SCORES (lowest to highest)
@@ -151,11 +151,11 @@ Strongest domain: ${highest?.domainName} at ${highest?.pct}%
 
 ====================
 COMPLETE RESPONSE RECORD
-Every item they answered, with the exact description they selected. Read all of it before writing. Look for contradictions between domains (for example a strong purchasing team but no trade partner onboarding, or a customer portal but no field documentation feeding it) — those contradictions are usually the most valuable insight in the report and should be called out by name.
+Every item they answered, with the exact description they selected. Read all of it before writing. Look for contradictions between domains (for example a strong purchasing team but no trade partner onboarding, or a customer portal but no field documentation feeding it) \u2014 those contradictions are usually the most valuable insight in the report and should be called out by name.
 ${fullRecord}
 
 ====================
-GAP ANALYSIS — FOCUS DOMAINS
+GAP ANALYSIS \u2014 FOCUS DOMAINS
 Current level vs. the next level up, lowest-scoring items first. Use this as the backbone of the action plans. Translate into plain, practical language; never paste these descriptions verbatim.
 ${gapAnalysis}
 ====================
@@ -163,18 +163,18 @@ ${gapAnalysis}
 WRITE THE FOLLOWING SECTIONS, IN THIS ORDER, USING EXACTLY THESE HEADINGS. Output valid HTML using only <h4>, <p>, <strong>, and <br/> tags. No markdown, no preamble, no closing remarks.
 
 <h4>Where You Stand</h4>
-[3–4 sentences. Name their level and what it means day to day in a business their size. Name the single biggest operational constraint holding them back and where in their answers it shows up. If there is a striking contradiction in the response record, name it here. Be direct; do not flatter.]
+[3\u20134 sentences. Name their level and what it means day to day in a business their size. Name the single biggest operational constraint holding them back and where in their answers it shows up. If there is a striking contradiction in the response record, name it here. Be direct; do not flatter.]
 
 <h4>Quick Wins (Next 30 Days)</h4>
 [3 actions that cost little or nothing, can be done in the next month by the people they already have, and produce a visible result. Draw from the lowest-scoring items anywhere in the record, not only the focus domains. Each item: what to do, who does it, what changes as a result. Numbered list with <br/> between items.]
 ${domainSectionInstructions}
 
 <h4>Protect Your Strength: ${highest?.domainName}</h4>
-[2–3 sentences. Name specifically what they are doing well, based on their actual answers in that domain, and one concrete way that strength can be used to pull up a weaker domain.]
+[2\u20133 sentences. Name specifically what they are doing well, based on their actual answers in that domain, and one concrete way that strength can be used to pull up a weaker domain.]
 ${watchInstructions}
 
 <h4>Before Your Next Assessment</h4>
-[2–3 sentences. Their reassessment is in six months. Tell them which two or three items, if moved up one level, would raise their overall score the most, and what score range that would put them in. Be specific about the item names.]
+[2\u20133 sentences. Their reassessment is in six months. Tell them which two or three items, if moved up one level, would raise their overall score the most, and what score range that would put them in. Be specific about the item names.]
 
 RULES
 - Reference their answers by item name ("Trade Partner Onboarding", "Scheduling and Capacity Management"), not by number.
@@ -266,8 +266,8 @@ export function normalizeToHtml(raw: string): string {
     // A short bold-only line is a heading too ("**Where You Stand**")
     const boldHeading = line.match(/^\*\*(.{3,80})\*\*:?$/)
     if (boldHeading) { flush(); out.push(`<h4>${boldHeading[1]}</h4>`); continue }
-    // Bullets → numbered-style lines inside one paragraph
-    const bullet = line.match(/^[-*•]\s+(.+)$/)
+    // Bullets -> numbered-style lines inside one paragraph
+    const bullet = line.match(/^[-*\u2022]\s+(.+)$/)
     para.push(bullet ? bullet[1] : line)
   }
   flush()

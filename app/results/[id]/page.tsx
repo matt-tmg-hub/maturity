@@ -165,7 +165,7 @@ export default function ResultsPage() {
       setSubscription(sub || null)
       setLoading(false)
 
-      // First visit after completing: recommendations haven't been generated yet — start now.
+      // First visit after completing: recommendations haven't been generated yet - start now.
       if (!a.ai_recommendations && a.status === 'complete' && !autoStarted.current) {
         autoStarted.current = true
         handleRegenerate(a)
@@ -544,7 +544,7 @@ export default function ResultsPage() {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 6 }}>
                 {formatDate(assessment.completed_at || assessment.created_at)}
-                {assessment.respondent_name && ` · ${assessment.respondent_name}`}
+                {assessment.respondent_name && ` \u00B7 ${assessment.respondent_name}`}
                 {assessment.respondent_title && `, ${assessment.respondent_title}`}
               </div>
               <h1 style={{ fontSize: 26, fontWeight: 700, margin: '0 0 12px', fontFamily: "'DM Serif Display',serif" }}>{assessment.company_name}</h1>
@@ -655,7 +655,7 @@ export default function ResultsPage() {
               <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Recommendations</h2>
               <button onClick={() => handleRegenerate()} disabled={regenerating} title="Re-run the recommendations engine against your saved responses"
                 style={{ fontSize: 12, fontWeight: 500, padding: '5px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#fff', color: regenerating ? '#9ca3af' : '#6b7280', cursor: regenerating ? 'default' : 'pointer' }}>
-                {regenerating ? 'Regenerating…' : 'Regenerate'}
+                {regenerating ? 'Regenerating\u2026' : 'Regenerate'}
               </button>
             </div>
             {regenError && <p style={{ fontSize: 13, color: '#b91c1c', margin: '0 0 12px' }}>{regenError}. Please try again in a moment.</p>}
