@@ -166,7 +166,7 @@ function DashboardInner() {
               <div>
                 <p style={{fontSize:14,fontWeight:700,color:'#92400e',margin:'0 0 2px'}}>Assessment In Progress</p>
                 <p style={{fontSize:13,color:'#b45309',margin:0}}>
-                  {inProgress.current_question_index != null ? `Paused at question ${inProgress.current_question_index + 1} of 53` : 'Paused â answers have been saved'}. Pick up right where you left off.
+                  {inProgress.current_question_index != null ? `Paused at item ${inProgress.current_question_index + 1} of 53` : 'Paused — answers have been saved'}. Pick up right where you left off.
                 </p>
               </div>
             </div>
@@ -259,7 +259,7 @@ function DashboardInner() {
           </>
         )}
 
-        {/* Assessment history â all completed + in-progress draft */}
+        {/* Assessment history — all completed + in-progress draft */}
         {(assessments.length > 1 || inProgress) && (
           <>
             <h2 style={{fontSize:16,fontWeight:700,color:'#111827',marginBottom:12}}>Assessment History</h2>
@@ -272,9 +272,9 @@ function DashboardInner() {
               {inProgress && (
                 <div style={{display:'flex',alignItems:'center',padding:'12px 20px',borderBottom:'1px solid #f3f4f6',gap:8,background:'#fffbeb'}}>
                   <span style={{flex:2,color:'#b45309',fontSize:13}}>{formatDate(inProgress.created_at)} <span style={{fontSize:10,fontWeight:600,background:'#fef3c7',color:'#92400e',padding:'1px 6px',borderRadius:4,marginLeft:4}}>IN PROGRESS</span></span>
-                  <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || 'â'}</span>
+                  <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || '—'}</span>
                   <span style={{flex:1,textAlign:'center',color:'#9ca3af',fontSize:13}}>
-                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : 'â'}
+                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : '—'}
                   </span>
                   <span style={{flex:2,fontSize:12,color:'#b45309'}}>Not completed</span>
                   <span style={{flex:1,textAlign:'right',display:'flex',gap:8,justifyContent:'flex-end'}}>
