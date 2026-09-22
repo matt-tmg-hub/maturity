@@ -122,12 +122,14 @@ export default function ResultsPage() {
         const { done, value } = await reader.read()
         if (done) break
         full += decoder.decode(value, { stream: true })
-        setStreamText(full)
+        setStreamText(full.split('<!--FINAL-->')[0])
       }
       const errMatch = full.match(/<!--ERROR:(.*?)-->/)
       if (errMatch) throw new Error(errMatch[1])
-      if (!full.includes('<h4>')) throw new Error('Generation returned no content')
-      setAssessment(prev => prev ? { ...prev, ai_recommendations: full.trim() } : prev)
+      const finalIdx = full.indexOf('<!--FINAL-->')
+      const finalHtml = finalIdx >= 0 ? full.slice(finalIdx + '<!--FINAL-->'.length).trim() : full.trim()
+      if (!finalHtml.includes('<h4>')) throw new Error('Generation returned no content')
+      setAssessment(prev => prev ? { ...prev, ai_recommendations: finalHtml } : prev)
       setStreamText('')
     } catch (err) {
       setRegenError(err instanceof Error ? err.message : 'Generation failed')

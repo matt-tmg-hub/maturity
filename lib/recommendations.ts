@@ -209,6 +209,7 @@ export async function streamRecommendations(
     const stream = anthropic.messages.stream({
       model: RECOMMENDATIONS_MODEL,
       max_tokens: 4000,
+      system: 'You write the recommendations section of an operational maturity report for a homebuilder CEO. Respond with the report content only: raw HTML fragments using <h4>, <p>, <strong> and <br/> tags. No Markdown, no code fences, no preamble or sign-off.',
       messages: [{ role: 'user', content: prompt }],
     })
     for await (const event of stream) {
@@ -223,10 +224,52 @@ export async function streamRecommendations(
     throw new Error(msg)
   }
 
-  full = full.trim()
+  full = normalizeToHtml(full)
+  if (!full) {
+    console.error('[recommendations] model returned no text')
+    throw new Error('AI_EMPTY')
+  }
   if (!full.includes('<h4>')) {
-    console.error('[recommendations] unexpected output format')
+    console.error('[recommendations] unexpected output format. First 400 chars:', full.slice(0, 400))
     throw new Error('AI_BAD_FORMAT')
   }
   return full
+}
+
+/**
+ * The model is asked for <h4>/<p> HTML, but if it answers in Markdown (headings, bold,
+ * numbered lists, code fences) convert that to the same HTML so the report still renders.
+ */
+export function normalizeToHtml(raw: string): string {
+  let text = raw.trim()
+  if (!text) return ''
+  // Strip ```html fences if present
+  text = text.replace(/^```(?:html)?\s*/i, '').replace(/\s*```$/, '').trim()
+  if (text.includes('<h4>')) return text
+
+  const lines = text.split(/\r?\n/)
+  const out: string[] = []
+  let para: string[] = []
+  const flush = () => {
+    if (para.length === 0) return
+    const inline = para
+      .map(l => l.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'))
+      .join('<br/>')
+    out.push(`<p>${inline}</p>`)
+    para = []
+  }
+  for (const rawLine of lines) {
+    const line = rawLine.trim()
+    if (!line) { flush(); continue }
+    const heading = line.match(/^#{1,6}\s+(.+?)\s*#*$/)
+    if (heading) { flush(); out.push(`<h4>${heading[1].replace(/\*\*/g, '')}</h4>`); continue }
+    // A short bold-only line is a heading too ("**Where You Stand**")
+    const boldHeading = line.match(/^\*\*(.{3,80})\*\*:?$/)
+    if (boldHeading) { flush(); out.push(`<h4>${boldHeading[1]}</h4>`); continue }
+    // Bullets → numbered-style lines inside one paragraph
+    const bullet = line.match(/^[-*•]\s+(.+)$/)
+    para.push(bullet ? bullet[1] : line)
+  }
+  flush()
+  return out.join('\n')
 }
