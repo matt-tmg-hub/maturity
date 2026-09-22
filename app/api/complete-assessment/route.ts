@@ -1,8 +1,7 @@
-export const maxDuration = 60
+export const maxDuration = 30
 
 import { createClient } from '@/lib/supabase/server'
 import { calculateScores } from '@/lib/scoring'
-import { generateRecommendations } from '@/lib/recommendations'
 import { z } from 'zod'
 
 const AssessmentSchema = z.object({
@@ -50,9 +49,9 @@ export async function POST(request: Request) {
 
     const { domainScores, overall, maturityLevel } = calculateScores(cleanAnswers)
 
-    // Never substitute boilerplate: if generation fails, store null and let the
-    // results page offer a regenerate. The error is logged inside generateRecommendations.
-    const { recommendations, error: recError } = await generateRecommendations(companyInfo, answers)
+    // Recommendations are generated separately by /api/regenerate-recommendations, which
+    // streams them to the results page. Saving here stays fast and can't time out.
+    const recommendations: string | null = null
 
     const domainScoresForDB = Object.fromEntries(
       Object.entries(domainScores).map(([k, v]) => [k, { pct: v.pct, answered: v.answered, total: v.total }])
@@ -96,7 +95,6 @@ export async function POST(request: Request) {
       overall,
       maturityLevel,
       recommendations,
-      recommendationsError: recError,
     })
   } catch (err) {
     console.error('complete-assessment error:', err)

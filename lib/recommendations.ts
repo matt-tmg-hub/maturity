@@ -184,54 +184,49 @@ RULES
 - Tone: direct, practical, respectful. Written for a homebuilder CEO by someone who has run a builder's operations.`
 }
 
-async function callModel(prompt: string, timeoutMs: number): Promise<string> {
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('AI_TIMEOUT')), timeoutMs)
-  )
-  const aiPromise = anthropic.messages.create({
-    model: RECOMMENDATIONS_MODEL,
-    max_tokens: 4000,
-    messages: [{ role: 'user', content: prompt }],
-  })
-  const response = await Promise.race([aiPromise, timeoutPromise])
-  const text = response.content[0]?.type === 'text' ? response.content[0].text.trim() : ''
-  if (!text.includes('<h4>')) throw new Error('AI_BAD_FORMAT')
-  return text
-}
-
 /**
- * Generates recommendations. Returns null on failure — callers must treat null as
- * "recommendations pending" and never substitute boilerplate. Logs the real error so it
- * shows up in Vercel function logs.
+ * Streams recommendations from the model. Calls onDelta with each text chunk as it arrives and
+ * resolves with the full text. Throws on API failure or if the output isn't in the expected format.
+ * Callers are responsible for persisting the result.
  */
-export async function generateRecommendations(
+export async function streamRecommendations(
   companyInfo: CompanyInfo,
-  answers: Record<string, string | null | undefined>
-): Promise<{ recommendations: string | null; error: string | null }> {
+  answers: Record<string, string | null | undefined>,
+  onDelta: (text: string) => void
+): Promise<string> {
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error('[recommendations] ANTHROPIC_API_KEY is not set')
-    return { recommendations: null, error: 'ANTHROPIC_API_KEY missing' }
+    throw new Error('ANTHROPIC_API_KEY missing')
   }
 
   const clean = Object.fromEntries(Object.entries(answers).filter(([, v]) => v !== null && v !== undefined)) as Record<string, string>
   const { domainScores, overall } = calculateScores(clean)
   const prompt = buildRecommendationsPrompt(companyInfo, domainScores, overall, answers)
 
-  // Total budget must fit inside the route's maxDuration (60s on Vercel)
-  const deadline = Date.now() + 55000
-  let lastError = ''
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    const remaining = deadline - Date.now()
-    if (remaining < 15000) break
-    try {
-      const text = await callModel(prompt, remaining)
-      return { recommendations: text, error: null }
-    } catch (err: unknown) {
-      lastError = err instanceof Error ? err.message : String(err)
-      console.error(`[recommendations] attempt ${attempt} failed (${RECOMMENDATIONS_MODEL}):`, lastError)
-      if (lastError === 'AI_TIMEOUT') break
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  let full = ''
+  try {
+    const stream = anthropic.messages.stream({
+      model: RECOMMENDATIONS_MODEL,
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: prompt }],
+    })
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        full += event.delta.text
+        onDelta(event.delta.text)
+      }
     }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error(`[recommendations] stream failed (${RECOMMENDATIONS_MODEL}):`, msg)
+    throw new Error(msg)
   }
-  return { recommendations: null, error: lastError }
+
+  full = full.trim()
+  if (!full.includes('<h4>')) {
+    console.error('[recommendations] unexpected output format')
+    throw new Error('AI_BAD_FORMAT')
+  }
+  return full
 }

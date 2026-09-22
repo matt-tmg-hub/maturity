@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DOMAINS, LEVEL_NAMES, type Question } from '@/lib/maturityData'
@@ -18,6 +18,7 @@ interface Assessment {
   domain_scores: Record<string, { pct: number; answered: number; total: number }>
   ai_recommendations: string | null
   answers: Record<string, string>
+  status?: string
   completed_at: string
   created_at: string
 }
@@ -95,26 +96,46 @@ export default function ResultsPage() {
   const [notFound, setNotFound] = useState(false)
   const [regenerating, setRegenerating] = useState(false)
   const [regenError, setRegenError] = useState<string | null>(null)
+  const [streamText, setStreamText] = useState('')
+  const autoStarted = useRef(false)
 
-  async function handleRegenerate() {
-    if (!assessment || regenerating) return
+  const handleRegenerate = useCallback(async (target?: Assessment) => {
+    const a = target || assessment
+    if (!a || regenerating) return
     setRegenerating(true)
     setRegenError(null)
+    setStreamText('')
     try {
       const res = await fetch('/api/regenerate-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assessmentId: assessment.id }),
+        body: JSON.stringify({ assessmentId: a.id }),
       })
-      const data = await res.json()
-      if (!res.ok || !data.recommendations) throw new Error(data.error || 'Generation failed')
-      setAssessment({ ...assessment, ai_recommendations: data.recommendations })
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Request failed (${res.status})`)
+      }
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let full = ''
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        full += decoder.decode(value, { stream: true })
+        setStreamText(full)
+      }
+      const errMatch = full.match(/<!--ERROR:(.*?)-->/)
+      if (errMatch) throw new Error(errMatch[1])
+      if (!full.includes('<h4>')) throw new Error('Generation returned no content')
+      setAssessment(prev => prev ? { ...prev, ai_recommendations: full.trim() } : prev)
+      setStreamText('')
     } catch (err) {
       setRegenError(err instanceof Error ? err.message : 'Generation failed')
+      setStreamText('')
     } finally {
       setRegenerating(false)
     }
-  }
+  }, [assessment, regenerating])
 
   useEffect(() => {
     async function load() {
@@ -141,8 +162,15 @@ export default function ResultsPage() {
       setAssessment(a)
       setSubscription(sub || null)
       setLoading(false)
+
+      // First visit after completing: recommendations haven't been generated yet — start now.
+      if (!a.ai_recommendations && a.status === 'complete' && !autoStarted.current) {
+        autoStarted.current = true
+        handleRegenerate(a)
+      }
     }
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, router])
 
   async function handleExportPDF() {
@@ -290,7 +318,7 @@ export default function ResultsPage() {
     // ---- RECOMMENDATIONS ----
     sectionDivider('Recommendations')
 
-    const recs = (assessment.ai_recommendations || '')
+    const recs = (assessment.ai_recommendations || '<p>Recommendations have not been generated for this assessment yet. Open the report online and click Generate Recommendations, then export again.</p>')
       .replace(/<h4>/g, '\n__HEADING__')
       .replace(/<\/h4>/g, '\n')
       .replace(/<strong>/g, '')
@@ -578,23 +606,52 @@ export default function ResultsPage() {
 
         {/* Recommendations */}
         {!assessment.ai_recommendations && (
-          <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 14, padding: '24px 28px', marginBottom: 24 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#78350f', margin: '0 0 8px' }}>Recommendations not yet generated</h2>
-            <p style={{ fontSize: 14, color: '#92400e', margin: '0 0 14px', lineHeight: 1.6 }}>
-              Your scores and responses are saved, but the recommendations step didn&apos;t complete. Generate them now — it takes about 30 seconds.
-            </p>
-            <button onClick={handleRegenerate} disabled={regenerating}
-              style={{ fontSize: 13, fontWeight: 600, padding: '9px 18px', borderRadius: 7, border: 'none', background: regenerating ? '#9ca3af' : '#0f1f3d', color: '#fff', cursor: regenerating ? 'default' : 'pointer' }}>
-              {regenerating ? 'Generating…' : 'Generate Recommendations'}
-            </button>
-            {regenError && <p style={{ fontSize: 13, color: '#b91c1c', margin: '12px 0 0' }}>{regenError}. Please try again in a moment.</p>}
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '28px', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 16px' }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Recommendations</h2>
+              {regenerating && (
+                <span style={{ fontSize: 12, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0f1f3d', display: 'inline-block', animation: 'pulse 1.2s ease-in-out infinite' }} />
+                  Writing your recommendations&hellip;
+                </span>
+              )}
+            </div>
+            {regenerating && streamText && (
+              <div
+                style={{ fontSize: 14, lineHeight: 1.75, color: '#374151' }}
+                dangerouslySetInnerHTML={{ __html: streamText
+                  .replace(/<!--ERROR:.*?-->/g, '')
+                  .replace(/<h4>/g, '<h4 style="font-size:15px;font-weight:700;color:#0f1f3d;margin:20px 0 8px;padding:0">')
+                  .replace(/<p>/g, '<p style="margin:0 0 12px;padding:0">')
+                }}
+              />
+            )}
+            {regenerating && !streamText && (
+              <p style={{ fontSize: 14, color: '#6b7280', margin: 0, lineHeight: 1.6 }}>
+                Reviewing all {Object.keys(assessment.answers || {}).length} of your responses. This usually takes under a minute, and the text will appear here as it&apos;s written.
+              </p>
+            )}
+            {!regenerating && (
+              <>
+                <p style={{ fontSize: 14, color: '#6b7280', margin: '0 0 14px', lineHeight: 1.6 }}>
+                  {regenError
+                    ? <>The recommendations couldn&apos;t be generated ({regenError}). Your scores and responses are saved &mdash; try again in a moment.</>
+                    : <>Your scores and responses are saved. Generate your recommendations to see your priorities and action plan.</>}
+                </p>
+                <button onClick={() => handleRegenerate()}
+                  style={{ fontSize: 13, fontWeight: 600, padding: '9px 18px', borderRadius: 7, border: 'none', background: '#0f1f3d', color: '#fff', cursor: 'pointer' }}>
+                  {regenError ? 'Try Again' : 'Generate Recommendations'}
+                </button>
+              </>
+            )}
+            <style>{`@keyframes pulse { 0%,100% { opacity: .25 } 50% { opacity: 1 } }`}</style>
           </div>
         )}
         {assessment.ai_recommendations && (
           <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '28px', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 20px' }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>Recommendations</h2>
-              <button onClick={handleRegenerate} disabled={regenerating} title="Re-run the recommendations engine against your saved responses"
+              <button onClick={() => handleRegenerate()} disabled={regenerating} title="Re-run the recommendations engine against your saved responses"
                 style={{ fontSize: 12, fontWeight: 500, padding: '5px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#fff', color: regenerating ? '#9ca3af' : '#6b7280', cursor: regenerating ? 'default' : 'pointer' }}>
                 {regenerating ? 'Regenerating…' : 'Regenerate'}
               </button>
@@ -602,7 +659,7 @@ export default function ResultsPage() {
             {regenError && <p style={{ fontSize: 13, color: '#b91c1c', margin: '0 0 12px' }}>{regenError}. Please try again in a moment.</p>}
             <div
               style={{ fontSize: 14, lineHeight: 1.75, color: '#374151' }}
-              dangerouslySetInnerHTML={{ __html: assessment.ai_recommendations
+              dangerouslySetInnerHTML={{ __html: (regenerating && streamText ? streamText.replace(/<!--ERROR:.*?-->/g, '') : assessment.ai_recommendations)
                 .replace(/<h4>/g, '<h4 style="font-size:15px;font-weight:700;color:#0f1f3d;margin:20px 0 8px;padding:0">')
                 .replace(/<p>/g, '<p style="margin:0 0 12px;padding:0">')
               }}
