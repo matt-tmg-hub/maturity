@@ -213,6 +213,19 @@ export default function AssessmentClient({
   )
 
   const firstUnansweredIdx = unansweredIndices.length > 0 ? unansweredIndices[0] : null
+  const allAnswered = firstUnansweredIdx === null
+
+  // Items must be answered in order. You can go back to anything already answered, or to the
+  // first unanswered item, but you can't jump ahead and leave gaps.
+  const lastAnsweredIdx = useMemo(() => {
+    let last = -1
+    ALL_QUESTIONS.forEach((q, i) => { if (answers[q.id] !== undefined) last = i })
+    return last
+  }, [answers])
+  const canJumpTo = (i: number) => allAnswered || i <= (firstUnansweredIdx ?? 0) || answers[ALL_QUESTIONS[i]?.id] !== undefined
+  // A gap left behind (e.g. from an older saved draft): unanswered but with later items answered
+  const isSkipped = (i: number) => answers[ALL_QUESTIONS[i]?.id] === undefined && i < lastAnsweredIdx
+  const skippedCount = unansweredIndices.filter(i => isSkipped(i)).length
 
   const liveScore = useMemo(() => {
     if (answeredCount < 5) return null
@@ -413,9 +426,11 @@ export default function AssessmentClient({
             const domainAnswered = d.questions.filter(q => answers[q.id] !== undefined).length
             const isActive = !onProfileStep && currentQuestion?.domainKey === d.key
             const firstQIdx = ALL_QUESTIONS.findIndex(q => q.domainKey === d.key)
+            const tabLocked = !canJumpTo(firstQIdx)
             return (
-              <button key={d.key} onClick={() => setCurrentQ(firstQIdx)}
-                style={{ padding: '8px 14px', fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? '#0f1f3d' : '#6b7280', background: 'none', border: 'none', borderBottom: isActive ? '2px solid #0f1f3d' : '2px solid transparent', cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 5 }}>
+              <button key={d.key} onClick={() => { if (!tabLocked) setCurrentQ(firstQIdx) }} disabled={tabLocked}
+                title={tabLocked ? 'Finish the earlier sections first' : undefined}
+                style={{ padding: '8px 14px', fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? '#0f1f3d' : tabLocked ? '#d1d5db' : '#6b7280', background: 'none', border: 'none', borderBottom: isActive ? '2px solid #0f1f3d' : '2px solid transparent', cursor: tabLocked ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 5 }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={d.iconPath} /></svg>
                 {d.short}
                 {domainAnswered === d.questions.length && (
@@ -442,9 +457,9 @@ export default function AssessmentClient({
             {firstUnansweredIdx !== null ? (
               <button
                 onClick={() => setCurrentQ(firstUnansweredIdx)}
-                style={{ fontSize: 11, fontWeight: 700, color: '#1d4ed8', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                style={{ fontSize: 11, fontWeight: 700, color: skippedCount > 0 ? '#b91c1c' : '#1d4ed8', background: skippedCount > 0 ? '#fef2f2' : '#eff6ff', border: `1px solid ${skippedCount > 0 ? '#fecaca' : '#bfdbfe'}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span>&#8594;</span>
-                {unansweredIndices.length} unanswered &#8212; Jump to first
+                {skippedCount > 0 ? `${skippedCount} skipped` : `${unansweredIndices.length} to go`} &#8212; {skippedCount > 0 ? 'Go to first skipped' : 'Go to next'}
               </button>
             ) : (
               <span style={{ fontSize: 11, fontWeight: 700, color: '#16a34a' }}>&#10003; All items answered</span>
@@ -458,19 +473,35 @@ export default function AssessmentClient({
                 <div key={domain.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 10, color: isActive ? '#0f1f3d' : '#9ca3af', fontWeight: isActive ? 700 : 400, width: 70, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{domain.short}</span>
                   <div style={{ display: 'flex', gap: 3 }}>
-                    {dqs.map(({ q, qi }) => (
-                      <button key={q.id} onClick={() => setCurrentQ(qi)} title={q.label}
-                        style={{ width: 14, height: 14, borderRadius: 2, border: qi === currentQ ? '2px solid #0f1f3d' : 'none', cursor: 'pointer', flexShrink: 0, background: qi === currentQ ? '#0f1f3d' : answers[q.id] !== undefined ? getScoreColor(answers[q.id] === 'na' ? 0 : (parseInt(answers[q.id]) + 1) * 25) : '#f3f4f6' }} />
-                    ))}
+                    {dqs.map(({ q, qi }) => {
+                      const ans = answers[q.id]
+                      const locked = !canJumpTo(qi)
+                      const skipped = qi !== currentQ && isSkipped(qi)
+                      const bg = qi === currentQ ? '#0f1f3d'
+                        : ans === 'na' ? '#9ca3af'
+                        : ans !== undefined ? getScoreColor((parseInt(ans) + 1) * 25)
+                        : skipped ? '#fff' : '#f3f4f6'
+                      return (
+                        <button key={q.id} onClick={() => { if (!locked) setCurrentQ(qi) }} disabled={locked}
+                          title={skipped ? `Skipped: ${q.label}` : locked ? 'Answer the earlier items first' : q.label}
+                          aria-label={skipped ? `Skipped: ${q.label}` : q.label}
+                          style={{ width: 14, height: 14, borderRadius: 2, boxSizing: 'border-box', padding: 0, border: qi === currentQ ? '2px solid #0f1f3d' : skipped ? '2px solid #dc2626' : 'none', cursor: locked ? 'not-allowed' : 'pointer', opacity: locked ? 0.5 : 1, flexShrink: 0, background: bg }} />
+                      )
+                    })}
                   </div>
                 </div>
               )
             })}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 0' }}>
-            <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Click any square to jump to that item</p>
-            <button onClick={() => setCurrentQ(TOTAL)}
-              style={{ fontSize: 11, fontWeight: 600, color: onProfileStep ? '#fff' : '#0f1f3d', background: onProfileStep ? '#0f1f3d' : '#f3f4f6', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+            <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>
+              {skippedCount > 0
+                ? <><span style={{ display: 'inline-block', width: 9, height: 9, border: '2px solid #dc2626', borderRadius: 2, verticalAlign: 'middle', marginRight: 5 }} />Red outline = skipped. Answer these (or mark N/A) before finishing.</>
+                : 'Click an answered square to go back and change it'}
+            </p>
+            <button onClick={() => { if (allAnswered) setCurrentQ(TOTAL) }} disabled={!allAnswered}
+              title={allAnswered ? undefined : 'Available once every item is answered'}
+              style={{ fontSize: 11, fontWeight: 600, color: onProfileStep ? '#fff' : allAnswered ? '#0f1f3d' : '#d1d5db', background: onProfileStep ? '#0f1f3d' : '#f3f4f6', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: allAnswered ? 'pointer' : 'not-allowed' }}>
               About Your Company
             </button>
           </div>
