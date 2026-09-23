@@ -31,6 +31,15 @@ interface Subscription {
 
 // Full question data for response summary
 
+const GEN_STEPS = [
+  'Reviewing every one of your responses',
+  'Finding your priority areas',
+  'Comparing where you are to the next level',
+  'Building your 90-day action plan',
+  'Writing your milestones',
+  'Finishing up',
+]
+
 const LEVEL_COLORS: Record<string, string> = {
   '-1': '#dc2626',
   '0': '#f59e0b',
@@ -81,6 +90,8 @@ export default function ResultsPage() {
   const [regenerating, setRegenerating] = useState(false)
   const [regenError, setRegenError] = useState<string | null>(null)
   const [streamText, setStreamText] = useState('')
+  const [genStep, setGenStep] = useState(0)
+  const recsRef = useRef<HTMLDivElement>(null)
 
   // Domain names, question labels and level text come from the question set this assessment was
   // answered against (v1 for older reports, v2 for current), so the report never drifts from what
@@ -131,6 +142,14 @@ export default function ResultsPage() {
       setRegenerating(false)
     }
   }, [assessment, regenerating])
+
+  // Cycle the status line while the model is thinking and before any text has streamed in.
+  useEffect(() => {
+    if (!regenerating || streamText) return
+    setGenStep(0)
+    const t = setInterval(() => setGenStep(s => Math.min(s + 1, GEN_STEPS.length - 1)), 5000)
+    return () => clearInterval(t)
+  }, [regenerating, streamText])
 
   useEffect(() => {
     async function load() {
@@ -575,6 +594,15 @@ export default function ResultsPage() {
           </div>
         </div>
 
+        {regenerating && !assessment.ai_recommendations && (
+          <button onClick={() => recsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '14px 18px', marginBottom: 24, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
+            <span className="bm-spin" style={{ width: 18, height: 18, border: '2.5px solid #bfdbfe', borderTopColor: '#1d4ed8', borderRadius: '50%', flexShrink: 0 }} />
+            <span style={{ flex: 1, fontSize: 14, color: '#1e3a8a' }}><strong>Your recommendations are being written.</strong> Your scores are ready now; the full report appears below in about a minute.</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#1d4ed8', whiteSpace: 'nowrap' }}>Jump to it &darr;</span>
+          </button>
+        )}
+
         {/* Domain scores */}
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '28px', marginBottom: 24 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 20px' }}>Domain Scores</h2>
@@ -600,6 +628,7 @@ export default function ResultsPage() {
         </div>
 
         {/* Recommendations */}
+        <div ref={recsRef} style={{ scrollMarginTop: 80 }} />
         {!assessment.ai_recommendations && (
           <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '28px', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 16px' }}>
@@ -621,10 +650,23 @@ export default function ResultsPage() {
                 }}
               />
             )}
-            {regenerating && !streamText && (
-              <p style={{ fontSize: 14, color: '#6b7280', margin: 0, lineHeight: 1.6 }}>
-                Reviewing all {Object.keys(assessment.answers || {}).filter(k => !isProfileKey(k)).length} of your responses. This usually takes under a minute, and the text will appear here as it&apos;s written.
+            {regenerating && streamText && (
+              <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#6b7280', margin: '8px 0 0' }}>
+                <span className="bm-spin" style={{ width: 12, height: 12, border: '2px solid #e5e7eb', borderTopColor: '#0f1f3d', borderRadius: '50%' }} />
+                Still writing&hellip;
               </p>
+            )}
+            {regenerating && !streamText && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '28px 12px 20px' }}>
+                <span className="bm-spin" style={{ width: 44, height: 44, border: '4px solid #e5e7eb', borderTopColor: '#0f1f3d', borderRadius: '50%', marginBottom: 18 }} />
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#0f1f3d', margin: '0 0 6px' }}>{GEN_STEPS[genStep]}&hellip;</p>
+                <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 440 }}>
+                  We&apos;re reading all {Object.keys(assessment.answers || {}).filter(k => !isProfileKey(k)).length} of your responses and writing recommendations specific to your company. This usually takes about a minute. The report will start appearing right here.
+                </p>
+                <div style={{ width: '100%', maxWidth: 360, height: 6, background: '#f3f4f6', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${((genStep + 1) / GEN_STEPS.length) * 100}%`, background: '#0f1f3d', borderRadius: 3, transition: 'width 1s ease' }} />
+                </div>
+              </div>
             )}
             {!regenerating && (
               <>
@@ -639,7 +681,7 @@ export default function ResultsPage() {
                 </button>
               </>
             )}
-            <style>{`@keyframes pulse { 0%,100% { opacity: .25 } 50% { opacity: 1 } }`}</style>
+            <style>{`@keyframes pulse { 0%,100% { opacity: .25 } 50% { opacity: 1 } } @keyframes bmspin { to { transform: rotate(360deg) } } .bm-spin { display: inline-block; animation: bmspin .8s linear infinite }`}</style>
           </div>
         )}
         {assessment.ai_recommendations && (

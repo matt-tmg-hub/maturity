@@ -386,12 +386,6 @@ export default function AssessmentClient({
               style={{ fontSize: 12, color: '#1d4ed8', background: 'none', border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>
               Glossary
             </button>
-            {answeredCount >= 10 && (
-              <button onClick={() => handleSubmit} disabled={submitting}
-                style={{ background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 7, padding: '7px 16px', fontSize: 13, fontWeight: 600, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
-                {submitting ? 'Saving...' : 'View Results'}
-              </button>
-            )}
           </div>
         </div>
         {/* Progress bars */}
@@ -535,7 +529,7 @@ export default function AssessmentClient({
 
             {unansweredIndices.length > 0 && (
               <p style={{ fontSize: 12, color: '#b45309', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '8px 12px', margin: '16px 0 0' }}>
-                {unansweredIndices.length} assessment {unansweredIndices.length === 1 ? 'item is' : 'items are'} still unanswered. Use the Progress Map to go back, or finish now.
+                {unansweredIndices.length} assessment {unansweredIndices.length === 1 ? 'item still needs' : 'items still need'} an answer before you can see your results. Use N/A for anything that doesn&apos;t apply to your business.
               </p>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
@@ -543,8 +537,8 @@ export default function AssessmentClient({
                 style={{ padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: '#374151', cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>
                 &larr; Previous
               </button>
-              <button onClick={handleSubmit} disabled={submitting || answeredCount < 10}
-                style={{ padding: '11px 22px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 700, cursor: submitting || answeredCount < 10 ? 'not-allowed' : 'pointer', opacity: submitting || answeredCount < 10 ? 0.6 : 1 }}>
+              <button onClick={handleSubmit} disabled={submitting || unansweredIndices.length > 0}
+                style={{ padding: '11px 22px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 700, cursor: submitting || unansweredIndices.length > 0 ? 'not-allowed' : 'pointer', opacity: submitting || unansweredIndices.length > 0 ? 0.5 : 1 }}>
                 {submitting ? 'Saving...' : 'Finish & View Results \u2192'}
               </button>
             </div>
@@ -614,15 +608,9 @@ export default function AssessmentClient({
               <button
                 onClick={handleNextClick}
                 className={nextShake ? 'next-shake' : ''}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: answers[currentQuestion?.id] ? '#374151' : '#d1d5db', cursor: answers[currentQuestion?.id] ? 'pointer' : 'default', fontSize: 13, fontWeight: 500, opacity: currentQ === TOTAL - 1 ? 0.4 : 1 }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: answers[currentQuestion?.id] ? '#374151' : '#d1d5db', cursor: answers[currentQuestion?.id] ? 'pointer' : 'default', fontSize: 13, fontWeight: 500 }}>
                 Next &rarr;
               </button>
-              {answeredCount >= 10 && (
-                <button onClick={() => handleSubmit} disabled={submitting}
-                  style={{ padding: '9px 20px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
-                  {submitting ? 'Saving...' : 'View Results'}
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -661,8 +649,8 @@ export default function AssessmentClient({
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,31,61,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 400 }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: '40px 48px', textAlign: 'center', maxWidth: 360 }}>
             <div style={{ width: 48, height: 48, border: '3px solid #e5e7eb', borderTop: '3px solid #0f1f3d', borderRadius: '50%', margin: '0 auto 20px', animation: 'spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 17, fontWeight: 700, color: '#0f1f3d', margin: '0 0 8px' }}>Calculating Your Score</p>
-            <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>Generating your recommendations&hellip; This takes about 10 seconds.</p>
+            <p style={{ fontSize: 17, fontWeight: 700, color: '#0f1f3d', margin: '0 0 8px' }}>Saving Your Answers</p>
+            <p style={{ fontSize: 13, color: '#6b7280', margin: 0, lineHeight: 1.6 }}>Calculating your scores now. On the next page your recommendations will be written while you watch &mdash; about a minute.</p>
           </div>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
