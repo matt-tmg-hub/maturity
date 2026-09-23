@@ -208,30 +208,48 @@ export async function streamRecommendations(
   const prompt = buildRecommendationsPrompt(companyInfo, domainScores, overall, answers)
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  const system = 'You write the recommendations section of an operational maturity report for a homebuilder CEO. Respond with the report content only: raw HTML fragments using <h4>, <p>, <strong> and <br/> tags. No Markdown, no code fences, no preamble or sign-off.'
+
+  // Up to two attempts. If the first returns no visible text (for example the model spent its whole
+  // budget thinking, or stopped early), retry once with thinking explicitly off and log why.
   let full = ''
-  try {
-    const stream = anthropic.messages.stream({
-      model: RECOMMENDATIONS_MODEL,
-      max_tokens: 4000,
-      system: 'You write the recommendations section of an operational maturity report for a homebuilder CEO. Respond with the report content only: raw HTML fragments using <h4>, <p>, <strong> and <br/> tags. No Markdown, no code fences, no preamble or sign-off.',
-      messages: [{ role: 'user', content: prompt }],
-    })
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        full += event.delta.text
-        onDelta(event.delta.text)
+  let lastInfo = ''
+  for (let attempt = 1; attempt <= 2 && !full.trim(); attempt++) {
+    full = ''
+    try {
+      const stream = anthropic.messages.stream({
+        model: RECOMMENDATIONS_MODEL,
+        max_tokens: 8000,
+        ...(attempt === 2 ? { thinking: { type: 'disabled' as const } } : {}),
+        system,
+        messages: [{ role: 'user', content: prompt }],
+      })
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+          full += event.delta.text
+          onDelta(event.delta.text)
+        }
       }
+      const final = await stream.finalMessage()
+      if (!full.trim()) {
+        // Fall back to any text blocks in the final message, in case deltas were missed.
+        full = final.content.map(b => (b.type === 'text' ? b.text : '')).join('')
+        if (full.trim()) onDelta(full)
+      }
+      lastInfo = `stop=${final.stop_reason}, blocks=${final.content.map(b => b.type).join('+') || 'none'}, out_tokens=${final.usage?.output_tokens}`
+      if (!full.trim()) console.error(`[recommendations] attempt ${attempt} returned no text (${RECOMMENDATIONS_MODEL}): ${lastInfo}`)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error(`[recommendations] attempt ${attempt} failed (${RECOMMENDATIONS_MODEL}):`, msg)
+      if (attempt === 2 || full.trim()) throw new Error(msg)
+      lastInfo = msg
     }
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error(`[recommendations] stream failed (${RECOMMENDATIONS_MODEL}):`, msg)
-    throw new Error(msg)
   }
 
   full = normalizeToHtml(full)
   if (!full) {
-    console.error('[recommendations] model returned no text')
-    throw new Error('AI_EMPTY')
+    console.error('[recommendations] model returned no text after retry:', lastInfo)
+    throw new Error(`AI_EMPTY: ${lastInfo}`)
   }
   if (!full.includes('<h4>')) {
     console.error('[recommendations] unexpected output format. First 400 chars:', full.slice(0, 400))
