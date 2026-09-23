@@ -35,6 +35,10 @@ const GLOSSARY_TERMS: { term: string; full: string; def: string }[] = [
   { term: 'Value Engineering', full: 'Value Engineering', def: 'Removing cost the buyer does not value through smarter specs, better processes, supply chain terms, or matching product to what buyers actually want.' },
   { term: 'Soft Cycle', full: 'Soft Cycle', def: 'The stretch between a signed contract and the start of construction: selections, financing, plans, and permits.' },
   { term: 'SOP', full: 'Standard Operating Procedure', def: 'A written description of how a task or handoff is done, what it needs to start, and what it must produce.' },
+  { term: 'Decision-Oriented Dashboard', full: 'Decision-Oriented Dashboard', def: 'A dashboard that shows the exceptions that need action (and who owns them) instead of every number, so leaders manage by exception.' },
+  { term: 'KPI vs. Driver', full: 'Key Performance Indicator vs. Driver Metric', def: 'A KPI (like gross margin) is usually lagging and shared by several people. A driver (like variance % or schedule slip) is leading, has one owner, and can be acted on directly.' },
+  { term: 'Margin Shift', full: 'Margin Shift', def: 'How a home\u2019s gross margin changes between contract and closing, broken out by cause (variances, change orders, incentives, vendor changes).' },
+  { term: 'Start Package', full: 'Start Package', def: 'The budget, purchase orders, and schedule released when a home starts. If it is incomplete, the budget does not reflect what the home will really cost.' },
   { term: 'AI / ML', full: 'Artificial Intelligence / Machine Learning', def: 'Software that learns from data to automate decisions \u2014 e.g., optimizing schedules, predicting buyer behavior, or flagging quality issues.' },
 ]
 

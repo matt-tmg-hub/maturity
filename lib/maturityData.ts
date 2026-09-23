@@ -564,17 +564,6 @@ export const DOMAINS: Domain[] = [
         },
       },
       {
-        id: '5.13',
-        label: `Reporting, KPIs & Visibility`,
-        levels: {
-          '-1': `No formal reporting. The owner knows the business by feel and learns how the year went from year-end financials.`,
-          '0': `Reports exist, but they're mostly data dumps: lots of numbers, little insight. Most decisions still come from experience and gut.`,
-          '1': `Key company metrics (closings, margin, cycle time, customer satisfaction) are tracked and reviewed on a set schedule.`,
-          '2': `Each role has one to three indicators that drive its decisions, delivered by the right tool at the right frequency. Reports answer "what should we do next," not just "what happened."`,
-          '3': `Decisions across the company are driven by insight, not just gut. Systems carry the data and surface what needs attention, so leadership can hand off decisions as the company grows without losing control.`,
-        },
-      },
-      {
         id: '5.9',
         label: `System Integration and Information Flow`,
         levels: {
@@ -594,6 +583,59 @@ export const DOMAINS: Domain[] = [
           '1': `Leadership knows which kind of platform it runs (point-to-point, integrated tools, or a single ERP), along with its strengths and gaps. New tools are chosen to fit that structure.`,
           '2': `The platform has been stress-tested against the volume the business plans to reach. Known breaking points have solutions chosen and scheduled before volume forces the issue.`,
           '3': `The platform is designed like a factory floor, so new capability can be added as the company grows. System changes happen on the company's timing, never in a panic because the current system is failing under volume.`,
+        },
+      },
+    ],
+  },
+  {
+    key: 'data',
+    name: 'Data & Decisions',
+    short: 'Data & Decisions',
+    iconPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+    desc: `Do your numbers tell you what to do next, or just what already happened?`,
+    questions: [
+      {
+        id: 'D.1',
+        label: `Metrics & KPI Design`,
+        levels: {
+          '-1': `Nobody has defined what to measure. The owner watches the bank balance and whatever accounting sends at month end.`,
+          '0': `Lots of numbers get reported, but nobody can say which ones matter. Most are lagging or vanity numbers (total sales, cash on hand, social followers) that look good but don't tell anyone what to do.`,
+          '1': `The company has a short list of key metrics tied to its goals, such as closings, gross margin, cycle time, and warranty. Each is calculated the same way every time, and leadership reviews them on a set schedule.`,
+          '2': `Every metric is fully defined: what it measures, who owns it, why it matters, how it's calculated, when it should alert, and where it's shown. KPIs are backed by leading driver metrics (variance %, schedule slip, trade overload) that one person can act on directly.`,
+          '3': `Metrics are designed to drive action, not decoration. Each has a single owner, a target range with alerts above and below, and a known action when it trips. Before a metric goes live, the team asks how it could be gamed or give a false reading, and adjusts. Vanity metrics have been retired.`,
+        },
+      },
+      {
+        id: 'D.2',
+        label: `From Data to Decisions`,
+        levels: {
+          '-1': `Reports are printed and reviewed with a ruler and a highlighter, one home at a time. Finding a problem depends on someone happening to spot it.`,
+          '0': `Reports are exported to Excel and reworked by hand. Someone spends hours every week rebuilding the same spreadsheets, and every department has its own version of the numbers.`,
+          '1': `Data is pulled straight from the system into a BI tool or a third-party report, built in-house or by an outside provider. The numbers are consistent, but people still have to dig through them to figure out what needs attention.`,
+          '2': `Decision-oriented dashboards show the exceptions, not everything: homes below margin, variances to address today, schedules slipping, vendors to call. If all is well, the dashboard says so. Each exception has an owner and a clear next step.`,
+          '3': `Leaders manage by exception. The tools answer "so what, and what do we do about it," down to the house, cost code, or vendor, and flag problems before they show up in the financials. Routine calls are automated or AI-assisted, so people spend their time on judgment rather than hunting for data.`,
+        },
+      },
+      {
+        id: 'D.3',
+        label: `Data Health & Integrity`,
+        levels: {
+          '-1': `Nobody checks whether the data in the system is right. Budgets, cost codes, and schedules are whatever got entered, and reports are trusted or ignored based on gut feel.`,
+          '0': `Data problems are found by accident, usually when a report looks wrong or a vendor gets paid twice. Clean-up happens in bursts, then things drift again.`,
+          '1': `Known data problems are checked on a schedule: $0 items on purchase orders, cost codes without activities, houses on hold, missing budget items. Someone owns fixing them.`,
+          '2': `Data health checks run automatically and show up as exceptions to fix, like any other alert. Start packages are checked for completeness before a house starts, so the budget reflects what the house will really cost.`,
+          '3': `The data is trusted because it is continuously checked. Problems are caught when they're created, not months later, and their causes (templates, setup, training) are fixed at the source. Hidden cash, like double payments or closed homes with open dollars, is found automatically.`,
+        },
+      },
+      {
+        id: 'D.4',
+        label: `Forward-Looking Analytics`,
+        levels: {
+          '-1': `The business only looks backward. Cash, margin, and closings are known after the fact, if at all.`,
+          '0': `Leadership tracks closed-home results and a few running totals. Forecasts are spreadsheets built by hand when a lender or partner asks for one.`,
+          '1': `Some forward-looking reporting exists, such as projected closings or a cash estimate, updated periodically. It relies on manual inputs and goes stale quickly.`,
+          '2': `Margin is forecast for homes still in production, and margin shift (how margin moves from contract to close) is tracked by cause. Cash flow is forecast weekly from the schedule and committed costs. Plans and options below target margin are flagged before they're sold again.`,
+          '3': `The business sees what's coming. Cash, margin, and cycle time forecasts update automatically from live schedule and cost data, and leadership acts on leading indicators rather than lagging results. Pricing, starts, and spending decisions are made weeks before the numbers would otherwise show the need.`,
         },
       },
     ],
@@ -645,8 +687,8 @@ export const DOMAINS: Domain[] = [
           '-1': `Margin is a guess until the job closes. No one knows if a house made money until accounting closes it out months later.`,
           '0': `Margin is estimated at contract and checked at closing. In between, cost surprises are normal and show up too late to do anything about.`,
           '1': `Margin is tracked per job during construction against budget. Finance and operations use the same numbers and are starting to speak the same language.`,
-          '2': `Leadership sees current margin by job, community, and plan, and knows which are slipping while there's still time to act. Cost surprises are the exception.`,
-          '3': `Margin is visible every day, not just at year end. Leadership knows what each plan, option, and community really earns and uses that to set pricing, product, and where to build next.`,
+          '2': `Leadership sees current and forecast margin by job, community, and plan, and tracks margin shift from contract to close by cause. Plans and options are checked against target margin before they're sold.`,
+          '3': `Margin is managed through its drivers, not discovered at closing. Offering profitability, revenue modifiers (incentives, lot premiums, concessions), and cost modifiers (variances, change orders, vendor changes) each have a target and an owner. Leadership knows what every plan, option, and community really earns and uses it to set pricing, product, and where to build next.`,
         },
       },
       {
@@ -676,7 +718,7 @@ export const DOMAINS: Domain[] = [
 ]
 
 // ---- Question set versioning ----
-// v2 (2026-09): 52 items, 7 domains. Questions that changed meaning got new IDs so answers saved
+// v2 (2026-09): 55 items, 8 domains. Questions that changed meaning got new IDs so answers saved
 // against v1 never attach to different wording. Unchanged questions kept their v1 IDs.
 export const QUESTION_SET_VERSION = 2
 

@@ -12,6 +12,7 @@ export default function HomePage() {
     internal: { icon: "\u2699\uFE0F", description: "How design, sales, accounting, and purchasing perform, and how cleanly work hands off from one team to the next." },
     builder_rep: { icon: "\u{1F477}", description: "How jobs get ready to start, how schedules are built and kept, and how your superintendents run construction through closing." },
     systems: { icon: "\u{1F4BB}", description: "Whether your technology gives you one version of the truth, turns data into decisions, and will hold up as you grow." },
+    data: { icon: "\u{1F4CA}", description: "Whether your numbers tell you what to do next: well-defined metrics, clean data, decision-ready dashboards, and forecasts you can act on." },
     cost: { icon: "\u{1F4B2}", description: "Whether you understand your costs as well as your vendors do: itemization, variances, margin visibility, and cost reduction." },
   };
   const domains = DOMAINS.map((d) => ({ key: d.key, title: d.name, count: d.questions.length, icon: DOMAIN_COPY[d.key]?.icon ?? "", description: DOMAIN_COPY[d.key]?.description ?? d.desc }));
