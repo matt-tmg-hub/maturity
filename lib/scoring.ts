@@ -1,4 +1,4 @@
-import { DOMAINS, LEVEL_SCORES } from './maturityData'
+import { DOMAINS, LEVEL_SCORES, type Domain } from './maturityData'
 
 export interface MaturityLevel {
   key: string
@@ -30,11 +30,11 @@ export function getLevelFromScore(pct: number): MaturityLevel {
   return { key: '3', name: 'Guiding Star', sentiment: 'Digitally Optimized' }
 }
 
-export function calculateScores(answers: Record<string, string | null>): ScoreResult {
+export function calculateScores(answers: Record<string, string | null>, domains: Domain[] = DOMAINS): ScoreResult {
   const domainScores: Record<string, DomainScore> = {}
   let answeredDomainCount = 0
 
-  DOMAINS.forEach(domain => {
+  domains.forEach(domain => {
     const domainAnswers = domain.questions
       .map(q => answers[q.id])
       .filter(a => a !== undefined && a !== null && a !== 'na') as string[]

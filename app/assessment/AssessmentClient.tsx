@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { DOMAINS } from '@/lib/maturityData'
+import { BUYER_OPTIONS, SOFTWARE_OPTIONS, VOLUME_OPTIONS, isProfileKey, profileToAnswers, readProfile, type Profile } from '@/lib/profile'
 import { calculateScores, getLevelFromScore } from '@/lib/scoring'
 
 interface CompanyInfo {
@@ -28,6 +29,12 @@ const GLOSSARY_TERMS: { term: string; full: string; def: string }[] = [
   { term: 'QC', full: 'Quality Control', def: 'Inspecting completed work against defined standards before approving payment or moving to the next phase.' },
   { term: 'KPI', full: 'Key Performance Indicator', def: 'A measurable metric to track business performance \u2014 e.g., cycle time, defect rate, or customer satisfaction score.' },
   { term: 'Stakeout', full: 'Stakeout', def: 'The surveying step where lot boundaries and foundation footprint are physically marked on the ground before construction begins.' },
+  { term: 'Itemization', full: 'Itemized Purchasing', def: 'Buying labor and material by what actually drives the vendor\u2019s cost (square feet, tonnage, fixtures, trips) instead of one lump-sum price per trade.' },
+  { term: 'Takeoff', full: 'Quantity Takeoff', def: 'Measuring quantities from the plans before work starts \u2014 yards of concrete, square feet of driveway, tons of stone \u2014 so the budget is set before the invoice arrives.' },
+  { term: 'Variance / VPO', full: 'Variance Purchase Order', def: 'Any cost outside the original purchase order. Tracked with a reason code so repeat causes can be fixed at the source.' },
+  { term: 'Value Engineering', full: 'Value Engineering', def: 'Removing cost the buyer does not value through smarter specs, better processes, supply chain terms, or matching product to what buyers actually want.' },
+  { term: 'Soft Cycle', full: 'Soft Cycle', def: 'The stretch between a signed contract and the start of construction: selections, financing, plans, and permits.' },
+  { term: 'SOP', full: 'Standard Operating Procedure', def: 'A written description of how a task or handoff is done, what it needs to start, and what it must produce.' },
   { term: 'AI / ML', full: 'Artificial Intelligence / Machine Learning', def: 'Software that learns from data to automate decisions \u2014 e.g., optimizing schedules, predicting buyer behavior, or flagging quality issues.' },
 ]
 
@@ -60,14 +67,17 @@ export default function AssessmentClient({
     editCompanyInfo || { company: '', name: '', title: 'CEO', volume: '', state: '' }
   )
   const [companyErrors, setCompanyErrors] = useState<Record<string, string>>({})
-  const [answers, setAnswers] = useState<Record<string, string>>(editAnswers || {})
+  // Scored answers only; profile (P.*) keys are split out into `profile`.
+  const [answers, setAnswers] = useState<Record<string, string>>(
+    Object.fromEntries(Object.entries(editAnswers || {}).filter(([k]) => !isProfileKey(k)))
+  )
+  const [profile, setProfile] = useState<Profile>(readProfile(editAnswers))
   const [currentQ, setCurrentQ] = useState(0)
   const [submitting, setSubmitting] = useState(false)
-  const [showCompletion, setShowCompletion] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [showResumeBanner, setShowResumeBanner] = useState(false)
   const [showGlossary, setShowGlossary] = useState(false)
-  const [draftData, setDraftData] = useState<{ answers: Record<string, string>; companyInfo: CompanyInfo } | null>(null)
+  const [draftData, setDraftData] = useState<{ answers: Record<string, string>; companyInfo: CompanyInfo; profile?: Profile } | null>(null)
   const [supabaseDraftId, setSupabaseDraftId] = useState<string | null>(editAssessmentId || null)
   const [nextShake, setNextShake] = useState(false)
   const [qCounterKey, setQCounterKey] = useState(0)
@@ -93,6 +103,7 @@ export default function AssessmentClient({
         if (Object.keys(parsed.answers || {}).length > 0) {
           setAnswers(parsed.answers)
           setCompanyInfo(parsed.companyInfo || { company: '', name: '', title: 'CEO', volume: '', state: '' })
+          if (parsed.profile) setProfile(parsed.profile)
           if (parsed.supabaseDraftId) setSupabaseDraftId(parsed.supabaseDraftId)
           if (typeof parsed.currentQ === 'number') setCurrentQ(parsed.currentQ)
           setScreen('assessment')
@@ -126,8 +137,8 @@ export default function AssessmentClient({
     const timer = setTimeout(async () => {
       try {
         localStorage.setItem(DRAFT_KEY(userId), JSON.stringify({
-          answers, companyInfo, savedAt: new Date().toISOString(),
-          version: 1, supabaseDraftId, currentQ
+          answers, companyInfo, profile, savedAt: new Date().toISOString(),
+          version: 2, supabaseDraftId, currentQ
         }))
       } catch {}
       // Supabase save - only if not in edit mode
@@ -136,7 +147,7 @@ export default function AssessmentClient({
           const res = await fetch('/api/save-draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ companyInfo, answers, currentQ, draftId: supabaseDraftId }),
+            body: JSON.stringify({ companyInfo, answers: { ...answers, ...profileToAnswers(profile) }, currentQ, draftId: supabaseDraftId }),
           })
           if (res.ok) {
             const d = await res.json()
@@ -146,7 +157,7 @@ export default function AssessmentClient({
       }
     }, 2000)
     return () => clearTimeout(timer)
-  }, [answers, companyInfo, screen, userId, currentQ, supabaseDraftId, editAssessmentId])
+  }, [answers, companyInfo, profile, screen, userId, currentQ, supabaseDraftId, editAssessmentId])
 
   // In edit mode: jump to first unanswered question on mount
   useEffect(() => {
@@ -159,6 +170,7 @@ export default function AssessmentClient({
     if (!draftData) return
     setAnswers(draftData.answers)
     setCompanyInfo(draftData.companyInfo)
+    if (draftData.profile) setProfile(draftData.profile)
     setShowResumeBanner(false)
     setScreen('assessment')
     const saved = JSON.parse(localStorage.getItem(DRAFT_KEY(userId)) || '{}')
@@ -191,7 +203,7 @@ export default function AssessmentClient({
   }
 
   const answeredCount = useMemo(() =>
-    Object.values(answers).filter(a => a !== null && a !== undefined).length,
+    ALL_QUESTIONS.filter(q => answers[q.id] !== null && answers[q.id] !== undefined).length,
     [answers]
   )
 
@@ -211,8 +223,8 @@ export default function AssessmentClient({
   function selectAnswer(qId: string, level: string) {
     setAnswers(prev => ({ ...prev, [qId]: level }))
     setTimeout(() => {
-      if (currentQ < TOTAL - 1) setCurrentQ(q => q + 1)
-      else setShowCompletion(true)
+      // After the last scored item, move to the short profile step (index TOTAL)
+      setCurrentQ(q => Math.min(q + 1, TOTAL))
     }, 320)
   }
 
@@ -222,7 +234,7 @@ export default function AssessmentClient({
       setTimeout(() => setNextShake(false), 500)
       return
     }
-    if (currentQ < TOTAL - 1) setCurrentQ(q => q + 1)
+    if (currentQ < TOTAL) setCurrentQ(q => q + 1)
   }
 
   async function handleSubmit() {
@@ -232,7 +244,7 @@ export default function AssessmentClient({
       const res = await fetch('/api/complete-assessment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyInfo, answers, assessmentId: supabaseDraftId || editAssessmentId || null }),
+        body: JSON.stringify({ companyInfo, answers: { ...answers, ...profileToAnswers(profile) }, assessmentId: supabaseDraftId || editAssessmentId || null }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -247,7 +259,8 @@ export default function AssessmentClient({
     }
   }
 
-  const currentQuestion = ALL_QUESTIONS[currentQ]
+  const onProfileStep = currentQ >= TOTAL
+  const currentQuestion = ALL_QUESTIONS[Math.min(currentQ, TOTAL - 1)]
   const currentDomain = DOMAINS.find(d => d.key === currentQuestion?.domainKey)
   const domainStartIdx = ALL_QUESTIONS.findIndex(q => q.domainKey === currentQuestion?.domainKey)
   const domainProgress = currentQ - domainStartIdx + 1
@@ -285,7 +298,7 @@ export default function AssessmentClient({
               {editAssessmentId ? 'Edit Your Assessment' : 'Start Your Assessment'}
             </h1>
             <p style={{ fontSize: 14, color: '#6b7280', margin: 0, lineHeight: 1.6 }}>
-              53 items across 6 operational domains. Takes about 20-30 minutes. Tell us a bit about your company first.
+              {TOTAL} items across {DOMAINS.length} operational domains. Takes about 20-30 minutes. Tell us a bit about your company first.
             </p>
           </div>
           <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '32px 28px' }}>
@@ -308,15 +321,6 @@ export default function AssessmentClient({
                   style={{ width: '100%', padding: '10px 12px', fontSize: 14, border: '1px solid #e5e7eb', borderRadius: 8, outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter',sans-serif" }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Homes Built Per Year</label>
-                <select value={companyInfo.volume} onChange={e => setCompanyInfo(p => ({ ...p, volume: e.target.value }))}
-                  style={{ width: '100%', padding: '10px 12px', fontSize: 14, border: '1px solid #e5e7eb', borderRadius: 8, outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter',sans-serif", background: '#fff', color: companyInfo.volume ? '#111827' : '#9ca3af' }}>
-                  <option value="">Select range</option>
-                  <option value="1-10">1-10</option><option value="11-25">11-25</option><option value="26-50">26-50</option>
-                  <option value="51-100">51-100</option><option value="101-250">101-250</option><option value="251-500">251-500</option><option value="500+">500+</option>
-                </select>
-              </div>
-              <div>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>State / Region</label>
                 <input type="text" value={companyInfo.state} onChange={e => setCompanyInfo(p => ({ ...p, state: e.target.value }))} placeholder="Texas"
                   style={{ width: '100%', padding: '10px 12px', fontSize: 14, border: '1px solid #e5e7eb', borderRadius: 8, outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter',sans-serif" }} />
@@ -327,11 +331,11 @@ export default function AssessmentClient({
             </div>
           </div>
           <div style={{ marginTop: 32 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 12 }}>6 Domains Covered</p>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: 12 }}>{DOMAINS.length} Domains Covered</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {DOMAINS.map((d, i) => (
                 <div key={d.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', width: 16 }}>{i}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', width: 16 }}>{i + 1}</span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={d.iconPath} /></svg>
                   <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{d.name}</span>
                   <span style={{ marginLeft: 'auto', fontSize: 12, color: '#9ca3af' }}>{d.questions.length} items</span>
@@ -383,7 +387,7 @@ export default function AssessmentClient({
               Glossary
             </button>
             {answeredCount >= 10 && (
-              <button onClick={() => { setShowCompletion(false); handleSubmit(); }} disabled={submitting}
+              <button onClick={() => handleSubmit} disabled={submitting}
                 style={{ background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 7, padding: '7px 16px', fontSize: 13, fontWeight: 600, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
                 {submitting ? 'Saving...' : 'View Results'}
               </button>
@@ -413,7 +417,7 @@ export default function AssessmentClient({
         <div style={{ display: 'flex', gap: 0, overflowX: 'auto', borderTop: '1px solid #f3f4f6' }}>
           {DOMAINS.map((d) => {
             const domainAnswered = d.questions.filter(q => answers[q.id] !== undefined).length
-            const isActive = currentQuestion?.domainKey === d.key
+            const isActive = !onProfileStep && currentQuestion?.domainKey === d.key
             const firstQIdx = ALL_QUESTIONS.findIndex(q => q.domainKey === d.key)
             return (
               <button key={d.key} onClick={() => setCurrentQ(firstQIdx)}
@@ -455,7 +459,7 @@ export default function AssessmentClient({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {DOMAINS.map((domain) => {
               const dqs = ALL_QUESTIONS.map((q, qi) => ({ q, qi })).filter(({ q }) => q.domainKey === domain.key)
-              const isActive = currentQuestion?.domainKey === domain.key
+              const isActive = !onProfileStep && currentQuestion?.domainKey === domain.key
               return (
                 <div key={domain.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 10, color: isActive ? '#0f1f3d' : '#9ca3af', fontWeight: isActive ? 700 : 400, width: 70, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{domain.short}</span>
@@ -469,16 +473,91 @@ export default function AssessmentClient({
               )
             })}
           </div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '10px 0 0' }}>Click any square to jump to that item</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 0' }}>
+            <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>Click any square to jump to that item</p>
+            <button onClick={() => setCurrentQ(TOTAL)}
+              style={{ fontSize: 11, fontWeight: 600, color: onProfileStep ? '#fff' : '#0f1f3d', background: onProfileStep ? '#0f1f3d' : '#f3f4f6', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+              About Your Company
+            </button>
+          </div>
         </div>
 
 
+        {onProfileStep && (
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '28px 28px 24px', marginTop: 24, marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#9ca3af', margin: '0 0 6px' }}>Last step &mdash; About Your Company</p>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f1f3d', margin: '0 0 6px', lineHeight: 1.3 }}>Three quick questions</h2>
+            <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 24px', lineHeight: 1.5 }}>Not scored. Your answers help tailor your recommendations to a builder of your size and buyer.</p>
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>1. How many homes do you build per year?</p>
+            <div role="radiogroup" aria-label="Homes built per year" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+              {VOLUME_OPTIONS.map(v => {
+                const sel = companyInfo.volume === v
+                return (
+                  <button key={v} role="radio" aria-checked={sel} onClick={() => setCompanyInfo(p => ({ ...p, volume: v }))}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderRadius: 10, border: `1.5px solid ${sel ? '#0f1f3d' : '#e2e5ea'}`, background: sel ? '#0f1f3d' : '#fff', color: sel ? '#fff' : '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    <span style={{ width: 14, height: 14, borderRadius: '50%', border: `2px solid ${sel ? '#fff' : '#b8c0cc'}`, background: '#fff', boxShadow: sel ? 'inset 0 0 0 3px #0f1f3d' : 'none', flexShrink: 0 }} />
+                    {v}
+                  </button>
+                )
+              })}
+            </div>
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#374151', margin: '0 0 4px' }}>2. Who are your primary buyers?</p>
+            <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 10px' }}>Select all that apply.</p>
+            <div role="group" aria-label="Primary buyers" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+              {BUYER_OPTIONS.map(o => {
+                const sel = profile.buyer.includes(o.value)
+                return (
+                  <button key={o.value} role="checkbox" aria-checked={sel}
+                    onClick={() => setProfile(p => ({ ...p, buyer: sel ? p.buyer.filter(b => b !== o.value) : [...p.buyer, o.value] }))}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${sel ? '#0f1f3d' : '#e2e5ea'}`, background: sel ? '#0f1f3d' : '#fff', color: sel ? '#fff' : '#374151', fontSize: 14, cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${sel ? '#fff' : '#b8c0cc'}`, background: sel ? '#fff' : '#fff', color: '#0f1f3d', fontSize: 12, fontWeight: 900, lineHeight: '12px', textAlign: 'center', flexShrink: 0 }}>{sel ? '\u2713' : ''}</span>
+                    {o.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#374151', margin: '0 0 10px' }}>3. What is your main operating software?</p>
+            <div role="radiogroup" aria-label="Main operating software" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+              {SOFTWARE_OPTIONS.map(o => {
+                const sel = profile.software === o.value
+                return (
+                  <button key={o.value} role="radio" aria-checked={sel} onClick={() => setProfile(p => ({ ...p, software: o.value }))}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderRadius: 10, border: `1.5px solid ${sel ? '#0f1f3d' : '#e2e5ea'}`, background: sel ? '#0f1f3d' : '#fff', color: sel ? '#fff' : '#374151', fontSize: 14, cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${sel ? '#fff' : '#b8c0cc'}`, background: '#fff', boxShadow: sel ? 'inset 0 0 0 4px #0f1f3d' : 'none', flexShrink: 0 }} />
+                    {o.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {unansweredIndices.length > 0 && (
+              <p style={{ fontSize: 12, color: '#b45309', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '8px 12px', margin: '16px 0 0' }}>
+                {unansweredIndices.length} assessment {unansweredIndices.length === 1 ? 'item is' : 'items are'} still unanswered. Use the Progress Map to go back, or finish now.
+              </p>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+              <button onClick={() => setCurrentQ(TOTAL - 1)}
+                style={{ padding: '9px 16px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: '#374151', cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>
+                &larr; Previous
+              </button>
+              <button onClick={handleSubmit} disabled={submitting || answeredCount < 10}
+                style={{ padding: '11px 22px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 700, cursor: submitting || answeredCount < 10 ? 'not-allowed' : 'pointer', opacity: submitting || answeredCount < 10 ? 0.6 : 1 }}>
+                {submitting ? 'Saving...' : 'Finish & View Results \u2192'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!onProfileStep && (<>
         {/* Domain header */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={currentQuestion?.domainIconPath} /></svg>
             <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#9ca3af' }}>
-              Domain {DOMAINS.findIndex(d => d.key === currentQuestion?.domainKey)} &mdash; {currentQuestion?.domainName}
+              Domain {DOMAINS.findIndex(d => d.key === currentQuestion?.domainKey) + 1} &mdash; {currentQuestion?.domainName}
             </span>
             <span style={{ marginLeft: 'auto', fontSize: 12, color: '#9ca3af' }}>{domainProgress} of {domainTotal}</span>
           </div>
@@ -539,7 +618,7 @@ export default function AssessmentClient({
                 Next &rarr;
               </button>
               {answeredCount >= 10 && (
-                <button onClick={() => { setShowCompletion(false); handleSubmit(); }} disabled={submitting}
+                <button onClick={() => handleSubmit} disabled={submitting}
                   style={{ padding: '9px 20px', background: '#0f1f3d', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
                   {submitting ? 'Saving...' : 'View Results'}
                 </button>
@@ -548,6 +627,7 @@ export default function AssessmentClient({
           </div>
         </div>
 
+        </>)}
       </main>
 
       {/* Glossary modal */}
@@ -571,31 +651,6 @@ export default function AssessmentClient({
                   <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.6 }}>{def}</p>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Completion modal */}
-      {showCompletion && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,31,61,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '24px' }}>
-          <div style={{ background: '#fff', borderRadius: 20, padding: '48px 40px', maxWidth: 520, width: '100%', textAlign: 'center', boxShadow: '0 24px 80px rgba(0,0,0,0.3)' }}>
-            <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', border: '3px solid #16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </div>
-            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, fontWeight: 400, color: '#0f1f3d', marginBottom: 12 }}>Assessment Complete!</h2>
-            <p style={{ fontSize: 15, color: '#6b7280', lineHeight: 1.6, marginBottom: 32 }}>
-              You've answered all {ALL_QUESTIONS.length} items. You can review and edit any previous answer, or click <strong>View Results</strong> to generate your report.
-            </p>
-            <div style={{ display: 'flex', gap: 12, flexDirection: 'column' }}>
-              <button onClick={() => { setShowCompletion(false); handleSubmit(); }}
-                style={{ backgroundColor: '#0f1f3d', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, padding: '14px 0', borderRadius: 10, width: '100%' }}>
-                View Results &#8594;
-              </button>
-              <button onClick={() => { setShowCompletion(false); setCurrentQ(0); }}
-                style={{ backgroundColor: 'transparent', color: '#0f1f3d', border: '2px solid #e5e7eb', cursor: 'pointer', fontSize: 15, fontWeight: 500, padding: '12px 0', borderRadius: 10, width: '100%' }}>
-                Review &amp; Edit Answers
-              </button>
             </div>
           </div>
         </div>

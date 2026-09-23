@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getDomainsFor, TOTAL_QUESTIONS, TOTAL_DOMAINS } from '@/lib/maturityData'
 
 interface UserProfile { id: string; email: string; full_name: string | null; company_name: string | null; title: string | null }
 interface Assessment { id: string; company_name: string; overall_score: number; maturity_level: string | null; maturity_level_key: string | null; domain_scores: Record<string, { pct: number; answered: number; total: number }>; completed_at: string; created_at: string; status?: string; current_question_index?: number; answers?: Record<string, string> }
@@ -10,10 +11,6 @@ interface Subscription { plan_type: 'annual' | 'onetime'; status: string; curren
 function getScoreColor(pct: number): string { if (pct < 25) return '#dc2626'; if (pct < 50) return '#f59e0b'; if (pct < 75) return '#3b82f6'; return '#16a34a' }
 function getLevelBadgeStyle(key: string | null) { if (key === '3') return { bg: '#dcfce7', color: '#15803d' }; if (key === '2') return { bg: '#dbeafe', color: '#1d4ed8' }; if (key === '1') return { bg: '#fef3c7', color: '#92400e' }; if (key === '0') return { bg: '#f3f4f6', color: '#374151' }; return { bg: '#fee2e2', color: '#991b1b' } }
 function formatDate(iso: string) { return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }
-
-const domainIcons: Record<string,string> = { org:'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', customer:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', trade:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0', internal:'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', builder_rep:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', systems:'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18' }
-const domainOrder = ['org','customer','trade','internal','builder_rep','systems']
-const domainNames: Record<string,string> = { org:'Org Culture', customer:'Customer Experience', trade:'Trade Partners', internal:'Internal Operations', builder_rep:'Field Management', systems:'Platform/Systems' }
 
 const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
 
@@ -166,7 +163,7 @@ function DashboardInner() {
               <div>
                 <p style={{fontSize:14,fontWeight:700,color:'#92400e',margin:'0 0 2px'}}>Assessment In Progress</p>
                 <p style={{fontSize:13,color:'#b45309',margin:0}}>
-                  {inProgress.current_question_index != null ? `Paused at item ${inProgress.current_question_index + 1} of 53` : 'Paused \u2014 answers have been saved'}. Pick up right where you left off.
+                  {inProgress.current_question_index != null ? `Paused at item ${inProgress.current_question_index + 1} of ${TOTAL_QUESTIONS}` : 'Paused \u2014 answers have been saved'}. Pick up right where you left off.
                 </p>
               </div>
             </div>
@@ -209,14 +206,14 @@ function DashboardInner() {
             <div style={{flex:1,minWidth:280}}>
               <div style={{display:'inline-block',background:'rgba(245,158,11,.15)',color:'#f59e0b',fontSize:11,fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',padding:'4px 12px',borderRadius:20,marginBottom:14,border:'1px solid rgba(245,158,11,.3)'}}>Get Started</div>
               <h2 style={{fontFamily:"'DM Serif Display',serif",fontSize:24,color:'#fff',lineHeight:1.2,marginBottom:12}}>Measure where your business stands today</h2>
-              <p style={{fontSize:14,color:'rgba(255,255,255,0.65)',lineHeight:1.7,marginBottom:24}}>The Homebuilding Maturity Assessment covers 53 items across 6 operational domains. Get your score, maturity level, and a personalized roadmap in under 30 minutes.</p>
+              <p style={{fontSize:14,color:'rgba(255,255,255,0.65)',lineHeight:1.7,marginBottom:24}}>The Homebuilding Maturity Assessment covers {TOTAL_QUESTIONS} items across {TOTAL_DOMAINS} operational domains. Get your score, maturity level, and a personalized roadmap in under 30 minutes.</p>
               <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
                 <a href="/pricing" style={{background:'#f59e0b',color:'#0f1f3d',border:'none',borderRadius:9,padding:'11px 24px',fontSize:14,fontWeight:700,textDecoration:'none',display:'inline-block'}}>See Pricing</a>
                 <span style={{fontSize:12,color:'rgba(255,255,255,0.45)'}}>From $149 one-time</span>
               </div>
             </div>
             <div style={{display:'flex',gap:32,flexWrap:'wrap'}}>
-              {[{label:'53',desc:'Scored questions'},{label:'6',desc:'Operational domains'},{label:'5',desc:'Maturity levels'}].map(s=>(
+              {[{label:String(TOTAL_QUESTIONS),desc:'Scored questions'},{label:String(TOTAL_DOMAINS),desc:'Operational domains'},{label:'5',desc:'Maturity levels'}].map(s=>(
                 <div key={s.label} style={{textAlign:'center'}}><div style={{fontSize:32,fontWeight:700,color:'#fff',fontFamily:"'DM Serif Display',serif"}}>{s.label}</div><div style={{fontSize:11,color:'rgba(255,255,255,0.45)',marginTop:2}}>{s.desc}</div></div>
               ))}
             </div>
@@ -238,10 +235,10 @@ function DashboardInner() {
                   )}
                 </div>
                 <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                  {domainOrder.map(key=>{const d=latestAssessment.domain_scores?.[key];if(!d)return null;return(
+                  {getDomainsFor(undefined, latestAssessment.domain_scores).map(dm=>{const key=dm.key;const d=latestAssessment.domain_scores?.[key];if(!d)return null;return(
                     <div key={key} style={{display:'flex',alignItems:'center',gap:8}}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d={domainIcons[key]}/></svg>
-                      <span style={{fontSize:12,color:'#374151',width:140,flexShrink:0,fontWeight:500}}>{domainNames[key]}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d={dm.iconPath}/></svg>
+                      <span style={{fontSize:12,color:'#374151',width:140,flexShrink:0,fontWeight:500}}>{dm.short}</span>
                       <div style={{flex:1,height:6,background:'#f3f4f6',borderRadius:3,overflow:'hidden'}}><div style={{height:'100%',borderRadius:3,width:`${d.pct}%`,background:getScoreColor(d.pct)}}/></div>
                       <span style={{fontSize:11,fontWeight:700,width:36,textAlign:'right',flexShrink:0,color:getScoreColor(d.pct)}}>{d.pct}%</span>
                     </div>
@@ -274,7 +271,7 @@ function DashboardInner() {
                   <span style={{flex:2,color:'#b45309',fontSize:13}}>{formatDate(inProgress.created_at)} <span style={{fontSize:10,fontWeight:600,background:'#fef3c7',color:'#92400e',padding:'1px 6px',borderRadius:4,marginLeft:4}}>IN PROGRESS</span></span>
                   <span style={{flex:2,fontSize:13,fontWeight:500,color:'#111827'}}>{inProgress.company_name || '\u2014'}</span>
                   <span style={{flex:1,textAlign:'center',color:'#9ca3af',fontSize:13}}>
-                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/53` : '\u2014'}
+                    {inProgress.current_question_index != null ? `Q${inProgress.current_question_index + 1}/${TOTAL_QUESTIONS}` : '\u2014'}
                   </span>
                   <span style={{flex:2,fontSize:12,color:'#b45309'}}>Not completed</span>
                   <span style={{flex:1,textAlign:'right',display:'flex',gap:8,justifyContent:'flex-end'}}>

@@ -3,6 +3,9 @@ export const maxDuration = 30
 import { createClient } from '@/lib/supabase/server'
 import { calculateScores } from '@/lib/scoring'
 import { z } from 'zod'
+import { isProfileKey } from '@/lib/profile'
+
+const SCORED_VALUES = ['-1', '0', '1', '2', '3', 'na']
 
 const AssessmentSchema = z.object({
   companyInfo: z.object({
@@ -12,10 +15,13 @@ const AssessmentSchema = z.object({
     volume: z.string().max(50).optional().default(''),
     state: z.string().max(50).optional().default(''),
   }),
-  answers: z.record(
-    z.string(),
-    z.enum(['-1', '0', '1', '2', '3', 'na']).nullable()
-  ),
+  // Scored items must be a level or 'na'. P.* keys hold the unscored end-of-assessment profile.
+  answers: z.record(z.string(), z.string().max(200).nullable()).superRefine((rec, ctx) => {
+    for (const [k, v] of Object.entries(rec)) {
+      if (v === null || isProfileKey(k)) continue
+      if (!SCORED_VALUES.includes(v)) ctx.addIssue({ code: 'custom', path: [k], message: 'Invalid answer' })
+    }
+  }),
   assessmentId: z.string().uuid().nullable().optional(),
 })
 

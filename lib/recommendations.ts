@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { calculateScores, getLevelFromScore, type DomainScore } from './scoring'
-import { DOMAINS, LEVEL_NAMES } from './maturityData'
+import { LEVEL_NAMES, getDomainsFor } from './maturityData'
+import { describeProfile, readProfile } from './profile'
 
 // Single source of truth for the recommendations engine.
 // Used by /api/complete-assessment (first run) and /api/regenerate-recommendations (re-runs).
@@ -55,6 +56,8 @@ export function buildRecommendationsPrompt(
   overall: number,
   answers: Record<string, string | null | undefined>
 ) {
+  const DOMAINS = getDomainsFor(answers)
+  const profile = readProfile(answers)
   const level = getLevelFromScore(overall)
   const sorted = Object.values(domainScores).filter(d => d.answered > 0).sort((a, b) => a.pct - b.pct)
   const highest = sorted[sorted.length - 1]
@@ -142,6 +145,7 @@ COMPANY
 - Respondent: ${companyInfo.name}, ${companyInfo.title}
 - Overall: ${overall}% \u2014 ${level.name} ("${level.sentiment}")
 - Sizing guidance: ${describeVolume(companyInfo.volume)}
+${describeProfile(profile)}
 
 DOMAIN SCORES (lowest to highest)
 ${domainSummary}
@@ -200,7 +204,7 @@ export async function streamRecommendations(
   }
 
   const clean = Object.fromEntries(Object.entries(answers).filter(([, v]) => v !== null && v !== undefined)) as Record<string, string>
-  const { domainScores, overall } = calculateScores(clean)
+  const { domainScores, overall } = calculateScores(clean, getDomainsFor(clean))
   const prompt = buildRecommendationsPrompt(companyInfo, domainScores, overall, answers)
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })

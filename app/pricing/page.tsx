@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { TOTAL_QUESTIONS } from '@/lib/maturityData'
 import { useRouter } from 'next/navigation'
 
 export default function PricingPage() {
@@ -30,7 +31,7 @@ export default function PricingPage() {
 
   const features: Record<'annual' | 'onetime', string[]> = {
     annual: ['Unlimited assessments', 'Edit & re-run assessments any time', 'Full PDF export with AI recommendations', 'Dashboard with historical tracking', 'Priority support'],
-    onetime: ['1 full 53-question assessment', 'AI-powered recommendations report', 'PDF export', 'No subscription needed'],
+    onetime: [`1 full ${TOTAL_QUESTIONS}-question assessment`, 'AI-powered recommendations report', 'PDF export', 'No subscription needed'],
   }
 
   return (
@@ -97,4 +98,4 @@ export default function PricingPage() {
       <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', paddingBottom: 48 }}>Payments secured by Stripe. Have a promo code? Enter it at checkout. Cancel annual plan any time.</p>
     </div>
   )
-}
+}
