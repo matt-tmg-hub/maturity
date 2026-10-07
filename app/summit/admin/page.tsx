@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
 import { notFound } from 'next/navigation'
-import { FIELDS, SECTIONS, sectionStarted, toRow } from '@/lib/summitSurvey'
+import { FIELDS, SECTIONS, communityCount, communityFields, sectionStarted, toRow } from '@/lib/summitSurvey'
 import { loadAllSurveys, requireSurveyAdmin } from '@/lib/summitAdmin'
 
 export const metadata: Metadata = {
@@ -74,7 +74,7 @@ export default async function SummitAdminPage() {
                   <div key={sec.title} style={{ marginTop: 16 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: '#56606D', marginBottom: 6 }}>{i + 1}. {sec.title}</div>
                     <dl style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 2fr', gap: '6px 16px', margin: 0, fontSize: 14 }}>
-                      {FIELDS.filter(f => f.section === i).map(f => (
+                      {[...FIELDS.filter(f => f.section === i), ...(i === 2 ? communityFields(communityCount(s.data || {})) : [])].map(f => (
                         <div key={f.key} style={{ display: 'contents' }}>
                           <dt style={{ color: '#56606D' }}>{f.label}</dt>
                           <dd style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{row[f.key] || '—'}</dd>

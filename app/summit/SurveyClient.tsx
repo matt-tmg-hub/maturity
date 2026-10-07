@@ -2,8 +2,8 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
 import {
-  SECTIONS, FORCES, PNL_LINES, DAY_BASIS, SURVEY_DUE,
-  calculate, fmt, withCommas, sectionStarted, type SurveyData,
+  SECTIONS, FORCES, PNL_LINES, DAY_BASIS, SURVEY_DUE, COMMUNITY_COLS, MAX_COMMUNITIES, communityCount,
+  calculate, fmt, num, withCommas, sectionStarted, type SurveyData,
 } from '@/lib/summitSurvey'
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
@@ -255,7 +255,7 @@ export default function SurveyClient({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {SECTIONS.map((s, i) => {
                 const on = i === sec
-                const started = sectionStarted(d, i) || (i === 4 && d.pnl_choice === 'skip')
+                const started = sectionStarted(d, i) || (i === 5 && d.pnl_choice === 'skip')
                 return (
                   <button key={s.title} type="button" onClick={() => go(i)} aria-current={on ? 'step' : undefined}
                     style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', minHeight: 44, padding: '8px 10px', border: 0, borderRadius: 8, fontSize: 15, cursor: 'pointer', textAlign: 'left', background: on ? '#FBEFE9' : 'transparent', color: on ? '#0f1f3d' : '#3B4552', fontWeight: on ? 600 : 400 }}>
@@ -367,7 +367,6 @@ export default function SurveyClient({
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_backlog_value')}>Use calculated value</button></div>
                           : <div className="hint">Backlog homes × average sale price. Type over it to change.</div>}
                       </div>
-                      {field('vol_sales_pace', 'Net sales per community', withSuffix('vol_sales_pace', 'per month'))}
                       {field('vol_cancel_pct', 'Cancellation rate', withSuffix('vol_cancel_pct', '%'))}
                     </div>
                   </div>
@@ -375,7 +374,7 @@ export default function SurveyClient({
 
                 {sec === 2 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                    {heading(3, 'Land and production', 'Your lot position and how homes move through construction.')}
+                    {heading(3, 'Land and communities', 'Your lot position and the communities you are selling and building in.')}
                     <div>
                       <div className="th" style={{ marginBottom: 12 }}>Lot position</div>
                       <div className="grid">
@@ -386,7 +385,44 @@ export default function SurveyClient({
                       </div>
                     </div>
                     <div>
-                      <div className="th" style={{ marginBottom: 12 }}>Production</div>
+                      <div className="th" style={{ marginBottom: 12 }}>Communities</div>
+                      <div style={{ maxWidth: 360 }}>
+                        {field('land_comm_count', 'Number of active communities', text('land_comm_count', { numeric: true }), 'Communities which include homes for 2026 and beyond closings.')}
+                      </div>
+                      {(num(val('land_comm_count')) ?? 0) > MAX_COMMUNITIES && (
+                        <div className="hint" style={{ color: '#A33F16' }}>Showing the first {MAX_COMMUNITIES}. Email Matt if you have more.</div>
+                      )}
+                      {communityCount(d) > 0 && (
+                        <div style={{ marginTop: 18, border: '1px solid #DCE1E7', borderRadius: 10, overflowX: 'auto' }}>
+                          <div style={{ minWidth: 720 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '32px minmax(180px,2fr) minmax(0,1fr) minmax(0,1fr) minmax(150px,1.3fr)', gap: 12, padding: '10px 14px', background: '#F6F8FA', borderBottom: '1px solid #DCE1E7' }}>
+                              <span className="th">#</span>
+                              {COMMUNITY_COLS.map(col => <span key={col.suffix} className="th">{col.label.replace(' ($)', '')}</span>)}
+                            </div>
+                            {Array.from({ length: communityCount(d) }, (_, idx) => {
+                              const n = idx + 1
+                              const k = (sfx: string) => `comm_${n}_${sfx}`
+                              return (
+                                <div key={n} style={{ display: 'grid', gridTemplateColumns: '32px minmax(180px,2fr) minmax(0,1fr) minmax(0,1fr) minmax(150px,1.3fr)', gap: 12, padding: '10px 14px', alignItems: 'center', borderBottom: n < communityCount(d) ? '1px solid #EDF0F3' : undefined }}>
+                                  <span style={{ fontSize: 14, color: '#56606D', fontWeight: 600 }}>{n}</span>
+                                  {text(k('name'), { label: `Community ${n} name`, placeholder: 'Community name' })}
+                                  {text(k('total'), { numeric: true, label: `Community ${n} total lots` })}
+                                  {text(k('remaining'), { numeric: true, label: `Community ${n} remaining lots` })}
+                                  {dollars(k('asp'), { label: `Community ${n} average sale price`, placeholder: '' })}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {sec === 3 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+                    {heading(4, 'Production', 'How homes move from contract through construction.')}
+                    <div>
                       <div className="grid">
                         {[['prod_soft_days', 'prod_soft_basis', 'Soft Cycle: avg days from contract to construction start', 'Soft Cycle day type'],
                           ['prod_build_days', 'prod_build_basis', 'Production Cycle: avg days from construction start to house completion', 'Production Cycle day type']].map(([k, b, l, bl]) => (
@@ -406,9 +442,9 @@ export default function SurveyClient({
                   </div>
                 )}
 
-                {sec === 3 && (
+                {sec === 4 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                    {heading(4, 'Systems', 'Just the tools you use. Your BuilderMaturity assessment already covers how your processes run.')}
+                    {heading(5, 'Systems', 'Just the tools you use. Your BuilderMaturity assessment already covers how your processes run.')}
                     <div className="grid">
                       {field('sys_erp', 'Accounting / ERP', text('sys_erp', { placeholder: 'e.g., MarkSystems' }))}
                       {field('sys_scheduling', 'Scheduling', text('sys_scheduling'))}
@@ -423,9 +459,9 @@ export default function SurveyClient({
                   </div>
                 )}
 
-                {sec === 4 && (
+                {sec === 5 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                    {heading(5, 'P&L snapshot', 'A high-level P&L. Enter whole dollars; rounded figures are fine. Percentages of revenue are calculated for you. These figures are used in your peer review and may come up in the group discussion. They are not shared outside the summit. Without them, the profitability part of your review is skipped.', true)}
+                    {heading(6, 'P&L snapshot', 'A high-level P&L. Enter whole dollars; rounded figures are fine. Percentages of revenue are calculated for you. These figures are used in your peer review and may come up in the group discussion. They are not shared outside the summit. Without them, the profitability part of your review is skipped.', true)}
                     <div role="radiogroup" aria-label="Share your P&L snapshot?" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 14 }}>
                       {[['share', 'Share for the peer review', 'Enter the figures below. Your review team uses them to discuss profitability.'],
                         ['skip', 'Skip this section', 'No problem. Your review covers the other areas only.']].map(([k, t, s]) => {
@@ -487,9 +523,9 @@ export default function SurveyClient({
                   </div>
                 )}
 
-                {sec === 5 && (
+                {sec === 6 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                    {heading(6, 'Market and competition', 'Your local market. This sets up the Day 2 session on market forces.')}
+                    {heading(7, 'Market and competition', 'Your local market. This sets up the Day 2 session on market forces.')}
                     <div>
                       <div className="lbl">Top competitors in your 55+ niche</div>
                       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 }}>
@@ -538,9 +574,9 @@ export default function SurveyClient({
                   </div>
                 )}
 
-                {sec === 6 && (
+                {sec === 7 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                    {heading(7, 'Looking ahead', 'What you want out of the two days.')}
+                    {heading(8, 'Looking ahead', 'What you want out of the two days.')}
                     {field('ahead_challenge', 'Your biggest operational challenge right now', area('ahead_challenge'))}
                     {field('ahead_focus', 'The one area you most want your review team to dig into', area('ahead_focus'))}
                     {field('ahead_worth', 'What would make these two days worth your time?', area('ahead_worth'))}
