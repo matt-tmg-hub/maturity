@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
 import {
-  SECTIONS, FORCES, PNL_LINES, DAY_BASIS, SURVEY_DUE, COMMUNITY_COLS, MAX_COMMUNITIES, communityCount,
+  SECTIONS, FORCES, PNL_LINES, DAY_BASIS, SURVEY_DUE, MAX_COMMUNITIES, communityCount,
   calculate, fmt, num, withCommas, sectionStarted, type SurveyData,
 } from '@/lib/summitSurvey'
 
@@ -28,6 +28,7 @@ textarea.fld{resize:vertical;min-height:88px}
 .pfx>span{display:flex;align-items:center;padding:0 12px;border:1px solid #C3CAD3;border-right:0;border-radius:8px 0 0 8px;background:#EEF1F4;color:#56606D;font-size:14px}
 .sfx>span{display:flex;align-items:center;padding:0 12px;border:1px solid #C3CAD3;border-left:0;border-radius:0 8px 8px 0;background:#EEF1F4;color:#56606D;font-size:14px;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px 24px}
+.grid{align-items:start}
 .card{background:#fff;border:1px solid #DCE1E7;border-radius:14px}
 .tag{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:3px 8px}
 .tag-opt{color:#56606D;background:#EEF1F4}
@@ -288,11 +289,11 @@ export default function SurveyClient({
                 {sec === 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
                     {heading(1, 'Company profile', 'Who you are and how the company is set up.')}
-                    <div className="grid">
+                    <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))' }}>
                       {field('co_company', 'Company name', text('co_company'))}
                       {field('co_respondent', 'Your name and role', text('co_respondent'))}
                       {field('co_founded', 'Year founded', text('co_founded', { placeholder: 'e.g., 1998', year: true }))}
-                      {field('co_franchise_year', 'Year you became an Epcon franchisee', text('co_franchise_year', { placeholder: 'e.g., 2015', year: true }))}
+                      {field('co_franchise_year', 'Epcon franchisee since', text('co_franchise_year', { placeholder: 'e.g., 2015', year: true }))}
                     </div>
                     {field('co_markets', 'Markets served', text('co_markets', { placeholder: 'Metro areas or counties' }))}
                     <div className="grid">
@@ -351,7 +352,7 @@ export default function SurveyClient({
                         </div>
                         {c.aspOverridden
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_asp')}>Use calculated value</button></div>
-                          : <div className="hint">2026 revenue ÷ 2026 closings. Type over it to change.</div>}
+                          : <div className="hint">2026 revenue ÷ 2026 closings. Type over to change.</div>}
                       </div>
                       {field('vol_options_pct', 'Options and upgrades', withSuffix('vol_options_pct', '% of price'))}
                       {field('vol_backlog_homes', 'Current backlog', withSuffix('vol_backlog_homes', 'homes'))}
@@ -365,7 +366,7 @@ export default function SurveyClient({
                         </div>
                         {c.backlogOverridden
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_backlog_value')}>Use calculated value</button></div>
-                          : <div className="hint">Backlog homes × average sale price. Type over it to change.</div>}
+                          : <div className="hint">Backlog homes × average sale price. Type over to change.</div>}
                       </div>
                       {field('vol_cancel_pct', 'Cancellation rate', withSuffix('vol_cancel_pct', '%'))}
                     </div>
@@ -394,16 +395,16 @@ export default function SurveyClient({
                       )}
                       {communityCount(d) > 0 && (
                         <div style={{ marginTop: 18, border: '1px solid #DCE1E7', borderRadius: 10, overflowX: 'auto' }}>
-                          <div style={{ minWidth: 720 }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '32px minmax(180px,2fr) minmax(0,1fr) minmax(0,1fr) minmax(150px,1.3fr)', gap: 12, padding: '10px 14px', background: '#F6F8FA', borderBottom: '1px solid #DCE1E7' }}>
+                          <div style={{ minWidth: 600 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '28px minmax(150px,2fr) minmax(90px,1fr) minmax(90px,1fr) minmax(140px,1.3fr)', gap: 12, padding: '10px 14px', background: '#F6F8FA', borderBottom: '1px solid #DCE1E7' }}>
                               <span className="th">#</span>
-                              {COMMUNITY_COLS.map(col => <span key={col.suffix} className="th">{col.label.replace(' ($)', '')}</span>)}
+                              {['Community name', 'Total lots', 'Remaining lots', 'Avg. sale price'].map(h => <span key={h} className="th">{h}</span>)}
                             </div>
                             {Array.from({ length: communityCount(d) }, (_, idx) => {
                               const n = idx + 1
                               const k = (sfx: string) => `comm_${n}_${sfx}`
                               return (
-                                <div key={n} style={{ display: 'grid', gridTemplateColumns: '32px minmax(180px,2fr) minmax(0,1fr) minmax(0,1fr) minmax(150px,1.3fr)', gap: 12, padding: '10px 14px', alignItems: 'center', borderBottom: n < communityCount(d) ? '1px solid #EDF0F3' : undefined }}>
+                                <div key={n} style={{ display: 'grid', gridTemplateColumns: '28px minmax(150px,2fr) minmax(90px,1fr) minmax(90px,1fr) minmax(140px,1.3fr)', gap: 12, padding: '10px 14px', alignItems: 'center', borderBottom: n < communityCount(d) ? '1px solid #EDF0F3' : undefined }}>
                                   <span style={{ fontSize: 14, color: '#56606D', fontWeight: 600 }}>{n}</span>
                                   {text(k('name'), { label: `Community ${n} name`, placeholder: 'Community name' })}
                                   {text(k('total'), { numeric: true, label: `Community ${n} total lots` })}
@@ -423,20 +424,45 @@ export default function SurveyClient({
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
                     {heading(4, 'Production', 'How homes move from contract through construction.')}
                     <div>
-                      <div className="grid">
-                        {[['prod_soft_days', 'prod_soft_basis', 'Soft Cycle: avg days from contract to construction start', 'Soft Cycle day type'],
-                          ['prod_build_days', 'prod_build_basis', 'Production Cycle: avg days from construction start to house completion', 'Production Cycle day type']].map(([k, b, l, bl]) => (
-                          <div key={k}>
-                            <label className="lbl" htmlFor={k}>{l}</label>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <input id={k} className="fld" inputMode="numeric" value={numVal(k)} onChange={numChange(k)} style={{ flex: '1 1 90px', minWidth: 0 }} />
-                              {select(b, DAY_BASIS, { label: bl, placeholder: 'Day type…', style: { flex: '1 1 150px', width: 'auto', minWidth: 0 } })}
-                            </div>
+                      <div className="th" style={{ marginBottom: 12 }}>Cycle times</div>
+                      <div style={{ border: '1px solid #DCE1E7', borderRadius: 10, overflowX: 'auto' }}>
+                        <div style={{ minWidth: 560 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px,1.4fr) 150px minmax(200px,1fr)', gap: 16, padding: '10px 18px', background: '#F6F8FA', borderBottom: '1px solid #DCE1E7' }}>
+                            <span className="th" /><span className="th">Average</span><span className="th">Day type</span>
                           </div>
-                        ))}
-                        {field('prod_wip', 'Homes under construction now', text('prod_wip', { numeric: true }))}
-                        {field('prod_spec_pct', 'Spec starts', withSuffix('prod_spec_pct', '% of starts'))}
-                        {field('prod_warranty', 'Warranty requests per home', text('prod_warranty', { numeric: true }), 'First year after closing.')}
+                          {[['prod_soft_days', 'prod_soft_basis', 'Soft Cycle', 'Contract to construction start'],
+                            ['prod_build_days', 'prod_build_basis', 'Production Cycle', 'Construction start to house completion']].map(([k, b, l, sub], i) => (
+                            <div key={k} style={{ display: 'grid', gridTemplateColumns: 'minmax(200px,1.4fr) 150px minmax(200px,1fr)', gap: 16, alignItems: 'center', padding: '14px 18px', borderBottom: i === 0 ? '1px solid #EDF0F3' : undefined }}>
+                              <label htmlFor={k}>
+                                <span style={{ display: 'block', fontWeight: 600, fontSize: 15 }}>{l}</span>
+                                <span style={{ display: 'block', fontSize: 13, color: '#56606D', marginTop: 2 }}>{sub}</span>
+                              </label>
+                              <div className="sfx">
+                                <input id={k} className="fld" inputMode="numeric" value={numVal(k)} onChange={numChange(k)} />
+                                <span>days</span>
+                              </div>
+                              <div role="radiogroup" aria-label={`${l} day type`} style={{ display: 'flex', border: '1px solid #C3CAD3', borderRadius: 8, overflow: 'hidden' }}>
+                                {DAY_BASIS.map((opt, j) => {
+                                  const on = val(b) === opt
+                                  return (
+                                    <button key={opt} type="button" role="radio" aria-checked={on} onClick={() => set(b, opt)}
+                                      style={{ flex: 1, minHeight: 42, border: 0, borderLeft: j ? '1px solid #C3CAD3' : 0, fontSize: 14, fontWeight: 600, cursor: 'pointer', background: on ? '#0f1f3d' : '#fff', color: on ? '#fff' : '#3B4552' }}>
+                                      {opt.replace(' days', '')}
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="th" style={{ marginBottom: 12 }}>Pipeline</div>
+                      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))' }}>
+                        {field('prod_wip', 'Under construction', withSuffix('prod_wip', 'homes'), 'As of today.')}
+                        {field('prod_spec_pct', 'Spec starts', withSuffix('prod_spec_pct', '% of starts'), 'Started without a buyer.')}
+                        {field('prod_warranty', 'Warranty requests', withSuffix('prod_warranty', 'per home'), 'First year after closing.')}
                       </div>
                     </div>
                   </div>
@@ -536,7 +562,7 @@ export default function SurveyClient({
                       {field('mkt_buyer_age', 'Typical buyer age range', text('mkt_buyer_age', { placeholder: 'e.g., 62–75' }))}
                       {field('mkt_buyer_origin', 'Where buyers move from', select('mkt_buyer_origin', ['Mostly within 10 miles', 'Same metro, 10+ miles', 'Out of state / relocating', 'Mixed']))}
                       {field('mkt_cash_pct', 'Cash buyers', withSuffix('mkt_cash_pct', '%'))}
-                      {field('mkt_epcon_share', 'Epcon share of local 55+ new-home sales', withSuffix('mkt_epcon_share', '% est.'))}
+                      {field('mkt_epcon_share', 'Epcon share of 55+ sales', withSuffix('mkt_epcon_share', '%'), 'Estimated share of local 55+ new-home sales.')}
                     </div>
                     <div>
                       <div className="lbl" style={{ marginBottom: 2 }}>In your market, how hard or easy is each of these?</div>
