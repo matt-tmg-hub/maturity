@@ -17,7 +17,10 @@ export default function LoginPage() {
     setError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError(error.message); setLoading(false); return }
-    router.push('/dashboard')
+    // Only same-site paths are allowed as a post-login destination.
+    const next = new URLSearchParams(window.location.search).get('next')
+    const dest = next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard'
+    router.push(dest)
     router.refresh()
   }
 
