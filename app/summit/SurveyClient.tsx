@@ -1,9 +1,9 @@
 'use client'
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
 import {
   SECTIONS, FORCES, PNL_LINES, DAY_BASIS, SURVEY_DUE,
-  calculate, fmt, sectionStarted, type SurveyData,
+  calculate, fmt, withCommas, sectionStarted, type SurveyData,
 } from '@/lib/summitSurvey'
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
@@ -134,14 +134,29 @@ export default function SurveyClient({
   const c = calculate(d)
 
   // ---- small render helpers (plain functions, so inputs keep focus) ----
-  const text = (k: string, opts: { id?: string; placeholder?: string; numeric?: boolean; label?: string } = {}) => (
+  // Figures get thousands separators as they are typed; the caret stays put.
+  const numChange = (k: string) => (e: ChangeEvent<HTMLInputElement>) => {
+    const el = e.target
+    const caret = el.selectionStart ?? el.value.length
+    const keep = el.value.slice(0, caret).replace(/[^\d.\-]/g, '').length
+    const next = withCommas(el.value)
+    set(k, next)
+    requestAnimationFrame(() => {
+      let pos = 0, seen = 0
+      while (pos < next.length && seen < keep) { if (/[\d.\-]/.test(next[pos])) seen++; pos++ }
+      try { el.setSelectionRange(pos, pos) } catch { /* input may have unmounted */ }
+    })
+  }
+  const numVal = (k: string) => withCommas(val(k))
+
+  const text = (k: string, opts: { id?: string; placeholder?: string; numeric?: boolean; year?: boolean; label?: string } = {}) => (
     <input
       id={opts.id ?? k}
       className="fld"
-      value={val(k)}
-      onChange={e => set(k, e.target.value)}
+      value={opts.numeric && !opts.year ? numVal(k) : val(k)}
+      onChange={opts.numeric && !opts.year ? numChange(k) : e => set(k, e.target.value)}
       placeholder={opts.placeholder}
-      inputMode={opts.numeric ? 'decimal' : undefined}
+      inputMode={opts.year ? 'numeric' : opts.numeric ? 'decimal' : undefined}
       aria-label={opts.label}
     />
   )
@@ -276,8 +291,8 @@ export default function SurveyClient({
                     <div className="grid">
                       {field('co_company', 'Company name', text('co_company'))}
                       {field('co_respondent', 'Your name and role', text('co_respondent'))}
-                      {field('co_founded', 'Year founded', text('co_founded', { placeholder: 'e.g., 1998', numeric: true }))}
-                      {field('co_franchise_year', 'Year you became an Epcon franchisee', text('co_franchise_year', { placeholder: 'e.g., 2015', numeric: true }))}
+                      {field('co_founded', 'Year founded', text('co_founded', { placeholder: 'e.g., 1998', year: true }))}
+                      {field('co_franchise_year', 'Year you became an Epcon franchisee', text('co_franchise_year', { placeholder: 'e.g., 2015', year: true }))}
                     </div>
                     {field('co_markets', 'Markets served', text('co_markets', { placeholder: 'Metro areas or counties' }))}
                     <div className="grid">
@@ -331,8 +346,8 @@ export default function SurveyClient({
                         <div className="pfx">
                           <span>$</span>
                           <input id="vol_asp" className="fld" inputMode="decimal" placeholder="Fills in from 2026 numbers"
-                            value={c.aspOverridden ? val('vol_asp') : c.aspCalc != null ? fmt(c.aspCalc) : ''}
-                            onChange={e => set('vol_asp', e.target.value)} />
+                            value={c.aspOverridden ? numVal('vol_asp') : c.aspCalc != null ? fmt(c.aspCalc) : ''}
+                            onChange={numChange('vol_asp')} />
                         </div>
                         {c.aspOverridden
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_asp')}>Use calculated value</button></div>
@@ -345,8 +360,8 @@ export default function SurveyClient({
                         <div className="pfx">
                           <span>$</span>
                           <input id="vol_backlog_value" className="fld" inputMode="decimal" placeholder="Fills in from backlog × price"
-                            value={c.backlogOverridden ? val('vol_backlog_value') : c.backlogValueCalc != null ? fmt(c.backlogValueCalc) : ''}
-                            onChange={e => set('vol_backlog_value', e.target.value)} />
+                            value={c.backlogOverridden ? numVal('vol_backlog_value') : c.backlogValueCalc != null ? fmt(c.backlogValueCalc) : ''}
+                            onChange={numChange('vol_backlog_value')} />
                         </div>
                         {c.backlogOverridden
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_backlog_value')}>Use calculated value</button></div>
@@ -378,7 +393,7 @@ export default function SurveyClient({
                           <div key={k}>
                             <label className="lbl" htmlFor={k}>{l}</label>
                             <div style={{ display: 'flex', gap: 8 }}>
-                              <input id={k} className="fld" inputMode="numeric" value={val(k)} onChange={e => set(k, e.target.value)} style={{ flex: '1 1 90px', minWidth: 0 }} />
+                              <input id={k} className="fld" inputMode="numeric" value={numVal(k)} onChange={numChange(k)} style={{ flex: '1 1 90px', minWidth: 0 }} />
                               {select(b, DAY_BASIS, { label: bl, placeholder: 'Day type…', style: { flex: '1 1 150px', width: 'auto', minWidth: 0 } })}
                             </div>
                           </div>
@@ -455,7 +470,7 @@ export default function SurveyClient({
                                   ) : (
                                     <div className="pfx">
                                       <span>$</span>
-                                      <input id={l.key} className="fld" inputMode="decimal" style={{ textAlign: 'right' }} value={val(l.key)} onChange={e => set(l.key, e.target.value)} />
+                                      <input id={l.key} className="fld" inputMode="decimal" style={{ textAlign: 'right' }} value={numVal(l.key)} onChange={numChange(l.key)} />
                                     </div>
                                   )}
                                   <span style={{ textAlign: 'right', fontSize: 15, color: '#3B4552', fontVariantNumeric: 'tabular-nums' }}>{p != null ? `${p.toFixed(1)}%` : '—'}</span>

@@ -120,6 +120,18 @@ export function num(v: string | undefined | null): number | null {
   return Number.isFinite(n) ? n : null
 }
 
+/** Format a typed figure with thousands separators as the user types ("1250000.5" → "1,250,000.5"). */
+export function withCommas(raw: string): string {
+  const cleaned = String(raw ?? '').replace(/[^\d.\-]/g, '')
+  if (cleaned === '') return ''
+  const neg = cleaned.startsWith('-')
+  const body = cleaned.replace(/-/g, '')
+  const [intPart, ...rest] = body.split('.')
+  const dec = rest.length ? '.' + rest.join('') : ''
+  const int = intPart.replace(/^0+(?=\d)/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return (neg ? '-' : '') + int + dec
+}
+
 export function fmt(n: number, digits = 0): string {
   return n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
