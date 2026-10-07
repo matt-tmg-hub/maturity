@@ -59,12 +59,12 @@ export const FIELDS: { key: string; label: string; section: number }[] = [
 
   { key: 'vol_closings_2025', label: 'Closings 2025 (homes)', section: 1 },
   { key: 'vol_closings_2026', label: 'Closings 2026 projected (homes)', section: 1 },
-  { key: 'vol_revenue_2025', label: 'Gross revenue 2025 ($M)', section: 1 },
-  { key: 'vol_revenue_2026', label: 'Gross revenue 2026 projected ($M)', section: 1 },
-  { key: 'calc_asp', label: 'Average sale price ($K)', section: 1 },
+  { key: 'vol_revenue_2025', label: 'Gross revenue 2025 ($)', section: 1 },
+  { key: 'vol_revenue_2026', label: 'Gross revenue 2026 projected ($)', section: 1 },
+  { key: 'calc_asp', label: 'Average sale price ($)', section: 1 },
   { key: 'vol_options_pct', label: 'Options and upgrades (% of price)', section: 1 },
   { key: 'vol_backlog_homes', label: 'Current backlog (homes)', section: 1 },
-  { key: 'calc_backlog_value', label: 'Backlog value ($M)', section: 1 },
+  { key: 'calc_backlog_value', label: 'Backlog value ($)', section: 1 },
   { key: 'vol_sales_pace', label: 'Net sales per community per month', section: 1 },
   { key: 'vol_cancel_pct', label: 'Cancellation rate (%)', section: 1 },
 
@@ -90,7 +90,7 @@ export const FIELDS: { key: string; label: string; section: number }[] = [
 
   { key: 'pnl_choice', label: 'P&L: share or skip', section: 4 },
   { key: 'pnl_period', label: 'P&L period', section: 4 },
-  ...PNL_LINES.map(l => ({ key: l.key, label: `${l.label} ($K)`, section: 4 })),
+  ...PNL_LINES.map(l => ({ key: l.key, label: `${l.label} ($)`, section: 4 })),
   ...PNL_LINES.filter(l => l.key !== 'pnl_revenue').map(l => ({ key: `pct_${l.key}`, label: `${l.label} (% of revenue)`, section: 4 })),
   { key: 'pnl_source', label: 'P&L source', section: 4 },
 
@@ -125,26 +125,26 @@ export function fmt(n: number, digits = 0): string {
 }
 
 export interface SurveyCalcs {
-  aspCalc: number | null      // $K, from 2026 revenue ÷ 2026 closings
-  asp: number | null          // $K, override if entered, else calculated
+  aspCalc: number | null      // $, from 2026 revenue ÷ 2026 closings
+  asp: number | null          // $, override if entered, else calculated
   aspOverridden: boolean
-  backlogValueCalc: number | null // $M, backlog homes × ASP
+  backlogValueCalc: number | null // $, backlog homes × ASP
   backlogValue: number | null
   backlogOverridden: boolean
-  gm: number | null           // $K
-  noi: number | null          // $K
+  gm: number | null           // $
+  noi: number | null          // $
   pct: Record<string, number | null> // P&L line → % of revenue
 }
 
 export function calculate(d: SurveyData): SurveyCalcs {
   const cl26 = num(d.vol_closings_2026)
   const rev26 = num(d.vol_revenue_2026)
-  const aspCalc = cl26 && rev26 ? Math.round((rev26 * 1000) / cl26) : null
+  const aspCalc = cl26 && rev26 ? Math.round(rev26 / cl26) : null
   const aspOverridden = d.vol_asp !== undefined
   const asp = aspOverridden ? num(d.vol_asp) : aspCalc
 
   const homes = num(d.vol_backlog_homes)
-  const backlogValueCalc = homes != null && asp != null ? Math.round((homes * asp) / 100) / 10 : null
+  const backlogValueCalc = homes != null && asp != null ? Math.round(homes * asp) : null
   const backlogOverridden = d.vol_backlog_value !== undefined
   const backlogValue = backlogOverridden ? num(d.vol_backlog_value) : backlogValueCalc
 

@@ -23,6 +23,9 @@ body{margin:0;background:#F3F5F8}
 textarea.fld{resize:vertical;min-height:88px}
 .sfx{display:flex;align-items:stretch}
 .sfx .fld{border-top-right-radius:0;border-bottom-right-radius:0;min-width:0}
+.pfx{display:flex;align-items:stretch}
+.pfx .fld{border-top-left-radius:0;border-bottom-left-radius:0;min-width:0}
+.pfx>span{display:flex;align-items:center;padding:0 12px;border:1px solid #C3CAD3;border-right:0;border-radius:8px 0 0 8px;background:#EEF1F4;color:#56606D;font-size:14px}
 .sfx>span{display:flex;align-items:center;padding:0 12px;border:1px solid #C3CAD3;border-left:0;border-radius:0 8px 8px 0;background:#EEF1F4;color:#56606D;font-size:14px;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px 24px}
 .card{background:#fff;border:1px solid #DCE1E7;border-radius:14px}
@@ -144,6 +147,9 @@ export default function SurveyClient({
   )
   const withSuffix = (k: string, suffix: string, opts: { id?: string; placeholder?: string; label?: string } = {}) => (
     <div className="sfx">{text(k, { ...opts, numeric: true })}<span>{suffix}</span></div>
+  )
+  const dollars = (k: string, opts: { id?: string; placeholder?: string; label?: string } = {}) => (
+    <div className="pfx"><span>$</span>{text(k, { placeholder: 'Whole dollars', ...opts, numeric: true })}</div>
   )
   const area = (k: string) => <textarea id={k} className="fld" rows={3} value={val(k)} onChange={e => set(k, e.target.value)} />
   const select = (k: string, options: readonly string[], opts: { label?: string; placeholder?: string; style?: CSSProperties } = {}) => (
@@ -314,19 +320,19 @@ export default function SurveyClient({
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,1.3fr) minmax(0,1fr) minmax(0,1fr)', gap: 16, padding: '14px 18px', alignItems: 'center' }}>
                           <span style={{ fontWeight: 600, fontSize: 15 }}>Gross revenue</span>
-                          {withSuffix('vol_revenue_2025', '$M', { label: 'Gross revenue 2025' })}
-                          {withSuffix('vol_revenue_2026', '$M', { label: 'Gross revenue 2026 projected' })}
+                          {dollars('vol_revenue_2025', { label: 'Gross revenue 2025', placeholder: 'e.g., 18,500,000' })}
+                          {dollars('vol_revenue_2026', { label: 'Gross revenue 2026 projected', placeholder: 'e.g., 21,000,000' })}
                         </div>
                       </div>
                     </div>
                     <div className="grid">
                       <div>
                         <label className="lbl" htmlFor="vol_asp">Average sale price <span className="tag tag-auto">Auto</span></label>
-                        <div className="sfx">
+                        <div className="pfx">
+                          <span>$</span>
                           <input id="vol_asp" className="fld" inputMode="decimal" placeholder="Fills in from 2026 numbers"
                             value={c.aspOverridden ? val('vol_asp') : c.aspCalc != null ? fmt(c.aspCalc) : ''}
                             onChange={e => set('vol_asp', e.target.value)} />
-                          <span>$K</span>
                         </div>
                         {c.aspOverridden
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_asp')}>Use calculated value</button></div>
@@ -336,11 +342,11 @@ export default function SurveyClient({
                       {field('vol_backlog_homes', 'Current backlog', withSuffix('vol_backlog_homes', 'homes'))}
                       <div>
                         <label className="lbl" htmlFor="vol_backlog_value">Backlog value <span className="tag tag-auto">Auto</span></label>
-                        <div className="sfx">
+                        <div className="pfx">
+                          <span>$</span>
                           <input id="vol_backlog_value" className="fld" inputMode="decimal" placeholder="Fills in from backlog × price"
-                            value={c.backlogOverridden ? val('vol_backlog_value') : c.backlogValueCalc != null ? fmt(c.backlogValueCalc, 1) : ''}
+                            value={c.backlogOverridden ? val('vol_backlog_value') : c.backlogValueCalc != null ? fmt(c.backlogValueCalc) : ''}
                             onChange={e => set('vol_backlog_value', e.target.value)} />
-                          <span>$M</span>
                         </div>
                         {c.backlogOverridden
                           ? <div className="hint">You entered your own figure. <button type="button" className="linkbtn" onClick={() => unset('vol_backlog_value')}>Use calculated value</button></div>
@@ -404,7 +410,7 @@ export default function SurveyClient({
 
                 {sec === 4 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                    {heading(5, 'P&L snapshot', 'A high-level P&L. Rounded figures in thousands are fine; percentages of revenue are calculated for you. These figures are used in your peer review and may come up in the group discussion. They are not shared outside the summit. Without them, the profitability part of your review is skipped.', true)}
+                    {heading(5, 'P&L snapshot', 'A high-level P&L. Enter whole dollars; rounded figures are fine. Percentages of revenue are calculated for you. These figures are used in your peer review and may come up in the group discussion. They are not shared outside the summit. Without them, the profitability part of your review is skipped.', true)}
                     <div role="radiogroup" aria-label="Share your P&L snapshot?" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 14 }}>
                       {[['share', 'Share for the peer review', 'Enter the figures below. Your review team uses them to discuss profitability.'],
                         ['skip', 'Skip this section', 'No problem. Your review covers the other areas only.']].map(([k, t, s]) => {
@@ -430,8 +436,8 @@ export default function SurveyClient({
                           </div>
                         </fieldset>
                         <div style={{ border: '1px solid #DCE1E7', borderRadius: 10, overflowX: 'auto' }}>
-                          <div style={{ minWidth: 460 }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 170px 90px', gap: 16, padding: '10px 18px', background: '#F6F8FA', borderBottom: '1px solid #DCE1E7' }}>
+                          <div style={{ minWidth: 500 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 210px 90px', gap: 16, padding: '10px 18px', background: '#F6F8FA', borderBottom: '1px solid #DCE1E7' }}>
                               <span className="th" /><span className="th">Amount</span><span className="th" style={{ textAlign: 'right' }}>% of rev.</span>
                             </div>
                             {PNL_LINES.map((l, i) => {
@@ -439,17 +445,17 @@ export default function SurveyClient({
                               const calcVal = l.key === 'calc_gm' ? c.gm : l.key === 'calc_noi' ? c.noi : null
                               const p = l.key === 'pnl_revenue' ? (c.pct.pnl_revenue != null ? 100 : null) : c.pct[l.key]
                               return (
-                                <div key={l.key} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 170px 90px', gap: 16, alignItems: 'center', padding: '10px 18px', borderBottom: i < PNL_LINES.length - 1 ? '1px solid #EDF0F3' : undefined, background: isCalc ? '#F6F8FA' : undefined }}>
+                                <div key={l.key} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 210px 90px', gap: 16, alignItems: 'center', padding: '10px 18px', borderBottom: i < PNL_LINES.length - 1 ? '1px solid #EDF0F3' : undefined, background: isCalc ? '#F6F8FA' : undefined }}>
                                   <label htmlFor={l.key} style={{ fontSize: 15, fontWeight: isCalc ? 700 : 500 }}>{l.label}</label>
                                   {isCalc ? (
                                     <div id={l.key} style={{ minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, padding: '0 12px', borderRadius: 8, background: '#EEF1F4', fontWeight: 700, fontSize: 15 }}>
                                       <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', color: '#A33F16' }}>Calc</span>
-                                      {calcVal != null ? `$${fmt(calcVal)}K` : '—'}
+                                      {calcVal != null ? `${calcVal < 0 ? '-' : ''}$${fmt(Math.abs(calcVal))}` : '—'}
                                     </div>
                                   ) : (
-                                    <div className="sfx">
+                                    <div className="pfx">
+                                      <span>$</span>
                                       <input id={l.key} className="fld" inputMode="decimal" style={{ textAlign: 'right' }} value={val(l.key)} onChange={e => set(l.key, e.target.value)} />
-                                      <span>$K</span>
                                     </div>
                                   )}
                                   <span style={{ textAlign: 'right', fontSize: 15, color: '#3B4552', fontVariantNumeric: 'tabular-nums' }}>{p != null ? `${p.toFixed(1)}%` : '—'}</span>
